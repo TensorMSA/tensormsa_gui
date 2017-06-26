@@ -141,7 +141,23 @@ export default class ReportRepository {
     }
 
     getNetBaseInfo(opt_url, params) {
-        let url='/api/v1/type/common/nninfo/' + opt_url + '/';
+        let url='/api/v1/type/common/target/nninfo/nnid/' + opt_url + '/';
+        return this.api.get(url, "").then((data) => {
+            data = JSON.parse(data);
+           return data;
+        });
+    }
+    //kyj
+    getAllNetVerInfo(opt_url, params) {
+        let url='/api/v1/type/common/target/nninfo/nnid/' + opt_url + '/version/';
+        return this.api.get(url, "").then((data) => {
+            data = JSON.parse(data);
+           return data;
+        });
+    }
+    //kyj
+    getAllNetBatchInfo(opt_url, opt_url1, params){
+        let url='/api/v1/type/common/target/nninfo/nnid/' + opt_url + '/version/' + opt_url1 + '/';
         return this.api.get(url, "").then((data) => {
             data = JSON.parse(data);
            return data;

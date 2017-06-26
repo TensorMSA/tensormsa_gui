@@ -3,6 +3,9 @@ import dc from 'dc'
 import crossfilter from 'crossfilter'
 import '../../node_modules/dc/dc.css'
 import StepArrowComponent from './../NNLayout/common/StepArrowComponent'
+import ReportRepository from './../repositories/ReportRepository'
+import Api from './../utils/Api'
+import NN_BatchComponent from './NN_BatchComponent'
 
 export default class NN_PreProcessingComponent extends React.Component {
     constructor(props) {
@@ -27,12 +30,17 @@ export default class NN_PreProcessingComponent extends React.Component {
                 {Name: 'KGH', Spent: '$30', Year: 2013}
             ],
             stepBack : 1,
-            stepForward : 3
+            stepForward : 3,
+            NN_TableData : null,
+            NN_BatchData : null
         }
     }
 
     componentDidMount() {
-        this.createChart(this.state.spendData);
+        //this.createChart(this.state.spendData);
+        this.props.reportRepository.getAllNetVerInfo(this.props.nnid).then((tableData) => {
+            this.setState({ NN_TableData: tableData })
+        });
     }
 
     createChart(spendData){
@@ -120,40 +128,113 @@ export default class NN_PreProcessingComponent extends React.Component {
         dc.renderAll();
     }
 
+    getBatch(nnid, nn_wf_ver_id){
+        this.props.reportRepository.getAllNetBatchInfo(nnid,nn_wf_ver_id).then((tableData) => {
+            this.setState({ NN_BatchData: tableData })
+        });
+    }
+
     render() {
-        return (  
-            <section>
-                <h1 className="hidden">Preprocessing</h1>
-                <ul className="tabHeader">
-                    <li className="current"><a href="#">Data</a></li>
-                    <div className="btnArea">
-                        <StepArrowComponent getHeaderEvent={this.props.getHeaderEvent} stepBack={this.state.stepBack} stepForward={this.state.stepForward}/>
+        const selectRowProp = {
+            mode: 'radio',
+            clickToSelect: true,
+            onSelect: onSelectRow,
+            thisClass : this
+        }
+
+        function onSelectRow(row) {
+            //this.thisClass.setState({NN_BatchData: <NN_BatchComponent nnid={this.thisClass.props.nnid} ver={row.nn_wf_ver_id}/> });
+            this.thisClass.getBatch(this.thisClass.props.nnid,row.nn_wf_ver_id);
+        }
+
+        if(this.state.NN_TableData != null && this.state.NN_BatchData != null){
+            return (  
+                <section>
+                    <div><br/><b>&nbsp;Network Info</b>
+                        <BootstrapTable data={this.props.netBaseInfo} 
+                            striped={true}
+                            hover={true}
+                            condensed={true}
+                            pagination={false}
+                            deleteRow={false}                           
+                            search={false}>
+                            <TableHeaderColumn isKey={true} dataField="nn_id">ID</TableHeaderColumn>
+                            <TableHeaderColumn dataField="biz_cate">Category</TableHeaderColumn>
+                            <TableHeaderColumn dataField="biz_sub_cate">Sub Category</TableHeaderColumn>
+                            <TableHeaderColumn dataField="nn_title">Title</TableHeaderColumn>
+                            <TableHeaderColumn dataField="nn_desc">Description</TableHeaderColumn>
+                        </BootstrapTable>
                     </div>
-                </ul>
-                 <div className="container tabBody">
-                    <article className="min-width-1">
-                    <div className="data-box-wrap">
-                        <div className="center-box">
-                            <dl className="data-box">
-                                <dt><span>Data info</span></dt>
-                                <dd id="chart-ring-year"></dd>
-                            </dl>
-                            <dl className="data-box width350">
-                                <dt><span>Train Status</span></dt>
-                                <dd id="chart-hist-spend"></dd>
-                            </dl>
-                            <dl className="data-box width350">
-                                <dt><span>TestResult</span></dt>
-                                <dd id="chart-row-spenders"></dd>
-                            </dl>
-                        </div>
+                    <div><br/><b>&nbsp;Version Info</b>
+                        <BootstrapTable data={this.state.NN_TableData} 
+                            striped={true}
+                            hover={true}
+                            condensed={true}
+                            pagination={false}
+                            deleteRow={false}
+                            selectRow={selectRowProp}
+                            search={false}>
+                            <TableHeaderColumn isKey={true} dataField="nn_wf_ver_id">ID</TableHeaderColumn>
+                            <TableHeaderColumn dataField="nn_wf_ver_info">Description</TableHeaderColumn>
+                            <TableHeaderColumn dataField="active_flag">Active Flag</TableHeaderColumn>
+                        </BootstrapTable>
                     </div>
-                    <div className="pre-tbl-wrap">
-                            <table id="table" className="table"></table>
-                        </div>
-                    </article>
-                 </div>  
-            </section>
-        )
+                    <div className='pre-tbl-wrap'><br/><b>&nbsp;Batch Info</b>
+                            <BootstrapTable data={this.state.NN_BatchData} 
+                                striped={true}
+                                hover={true}
+                                condensed={true}
+                                pagination={true}
+                                deleteRow={false}
+                                search={false}>
+                                <TableHeaderColumn isKey={true} dataField="nn_batch_ver_id">ID</TableHeaderColumn>
+                                <TableHeaderColumn dataField="nn_batch_ver_info">Description</TableHeaderColumn>
+                                <TableHeaderColumn dataField="active_flag">Active Flag</TableHeaderColumn>
+                                <TableHeaderColumn dataField="eval_flag">Evaluation Flag</TableHeaderColumn>
+                            </BootstrapTable>
+                        </div>   
+                </section>
+            )
+        }
+        else if(this.state.NN_TableData != null){
+            return (  
+                <section>
+                    <div><br/><b>&nbsp;Network Info</b>
+                        <BootstrapTable data={this.props.netBaseInfo} 
+                            striped={true}
+                            hover={true}
+                            condensed={true}
+                            pagination={false}
+                            deleteRow={false}                           
+                            search={false}>
+                            <TableHeaderColumn isKey={true} dataField="nn_id">ID</TableHeaderColumn>
+                            <TableHeaderColumn dataField="biz_cate">Category</TableHeaderColumn>
+                            <TableHeaderColumn dataField="biz_sub_cate">Sub Category</TableHeaderColumn>
+                            <TableHeaderColumn dataField="nn_title">Title</TableHeaderColumn>
+                            <TableHeaderColumn dataField="nn_desc">Description</TableHeaderColumn>
+                        </BootstrapTable>
+                    </div>
+                    <div><br/><b>&nbsp;Version Info</b>
+                        <BootstrapTable data={this.state.NN_TableData} 
+                            striped={true}
+                            hover={true}
+                            condensed={true}
+                            pagination={false}
+                            deleteRow={false}
+                            selectRow={selectRowProp}
+                            search={false}>
+                            <TableHeaderColumn isKey={true} dataField="nn_wf_ver_id">ID</TableHeaderColumn>
+                            <TableHeaderColumn dataField="nn_wf_ver_info">Description</TableHeaderColumn>
+                            <TableHeaderColumn dataField="active_flag">Active Flag</TableHeaderColumn>
+                        </BootstrapTable>
+                    </div>  
+                </section>
+            )
+        }
+        return null
     }
 }
+
+NN_PreProcessingComponent.defaultProps = {
+    reportRepository: new ReportRepository(new Api())
+};
