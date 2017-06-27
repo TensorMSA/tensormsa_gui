@@ -9,10 +9,40 @@ export default class ReportRepository {
         });
     }
 
+    getNetBaseInfo(opt_url, params) {
+        let url='/api/v1/type/common/nninfo/' + opt_url + '/';
+        return this.api.get(url, "").then((data) => {
+            data = JSON.parse(data);
+           return data;
+        });
+    }
+
+    getCommonNNInfoNew(opt_url, params) {
+        return this.api.get('/api/v1/type/automl/state/rule/graph_id/all/', '').then((data) => {
+            data = JSON.parse(data);
+            console.log("getCommonNNInfoNew===========");
+            console.log(data)
+            console.log("==========================");
+           return data;
+        });
+    }
+
     getCommonNNInfo(params) {
         return this.api.get('/api/v1/type/common/target/nninfo/nnid/all/', '').then((data) => {
-           data = JSON.parse(data);
-           return data;
+            data = JSON.parse(data);
+            console.log("getCommonNNInfo===========");
+            console.log(data)
+            console.log("==========================");
+            return data;
+        });
+    }
+
+    putCommonNNInfo(params, jsonData) {
+        return this.api.put('/api/v1/type/common/target/nninfo/nnid/'+params+'/', jsonData).then((data) => {
+            console.log("putCommonNNInfo===========");
+            console.log(data)
+            console.log("==========================");
+            return data;
         });
     }
 
@@ -23,14 +53,6 @@ export default class ReportRepository {
             data = JSON.parse(data);
             console.log(data);
            return data;
-        });
-    }
-
-    deleteCommonNNInfo(params) {
-        let url='/api/v1/type/common/nninfo/' + params + '/';
-        return this.api.delete(url, "").then((data) => {
-            data = JSON.parse(data);
-            return data;
         });
     }
 
@@ -140,13 +162,6 @@ export default class ReportRepository {
         });
     }
 
-    getNetBaseInfo(opt_url, params) {
-        let url='/api/v1/type/common/target/nninfo/nnid/' + opt_url + '/';
-        return this.api.get(url, "").then((data) => {
-            data = JSON.parse(data);
-           return data;
-        });
-    }
     //kyj
     getAllNetVerInfo(opt_url, params) {
         let url='/api/v1/type/common/target/nninfo/nnid/' + opt_url + '/version/';
