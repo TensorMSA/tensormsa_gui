@@ -5,7 +5,6 @@ import '../../node_modules/dc/dc.css'
 import StepArrowComponent from './../NNLayout/common/StepArrowComponent'
 import ReportRepository from './../repositories/ReportRepository'
 import Api from './../utils/Api'
-import NN_BatchComponent from './NN_BatchComponent'
 
 export default class NN_PreProcessingComponent extends React.Component {
     constructor(props) {
@@ -143,7 +142,6 @@ export default class NN_PreProcessingComponent extends React.Component {
         }
 
         function onSelectRow(row) {
-            //this.thisClass.setState({NN_BatchData: <NN_BatchComponent nnid={this.thisClass.props.nnid} ver={row.nn_wf_ver_id}/> });
             this.thisClass.getBatch(this.thisClass.props.nnid,row.nn_wf_ver_id);
         }
 
