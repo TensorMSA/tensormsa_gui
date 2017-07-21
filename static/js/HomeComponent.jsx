@@ -13,6 +13,7 @@ import MainSectionComponent from './NNLayout/MainSectionComponent';
 import NN_PreProcessingComponent from './NNConfiguration/NN_PreProcessingComponent'
 import ReportRepository from './repositories/ReportRepository';
 import Api from './utils/Api';
+import NN_InfoNewComponent from './NNConfiguration/NN_InfoNewComponent'
 
 export default class HomeComponent extends React.Component {
     constructor(props) {
@@ -74,15 +75,15 @@ export default class HomeComponent extends React.Component {
 
         if(this.state.NN_ID){
             this.props.reportRepository.getNetBaseInfo(this.state.NN_ID).then((nnBaseInfo) => {
-              if(nnBaseInfo && nnBaseInfo['result'].length > 0){
-                this.setState({NN_TYPE : nnBaseInfo['result'][0]['fields']['type']});
-                this.setState({NN_DATAVALID : nnBaseInfo['result'][0]['fields']['datavaild']});
-                this.setState({NN_CONFIG : nnBaseInfo['result'][0]['fields']['config']});
-                this.setState({NN_CONFVALID : nnBaseInfo['result'][0]['fields']['confvaild']});
-                this.setState({NN_TRAIN : nnBaseInfo['result'][0]['fields']['train']});
-                this.setState({NN_DATATYPE : nnBaseInfo['result'][0]['fields']['preprocess']});
-                this.setState({NN_TITLE : nnBaseInfo['result'][0]['fields']['name']});
-            }
+            //   if(nnBaseInfo && nnBaseInfo.length > 0){
+            //     this.setState({NN_TYPE : nnBaseInfo['result'][0]['fields']['type']});
+            //     this.setState({NN_DATAVALID : nnBaseInfo['result'][0]['fields']['datavaild']});
+            //     this.setState({NN_CONFIG : nnBaseInfo['result'][0]['fields']['config']});
+            //     this.setState({NN_CONFVALID : nnBaseInfo['result'][0]['fields']['confvaild']});
+            //     this.setState({NN_TRAIN : nnBaseInfo['result'][0]['fields']['train']});
+            //     this.setState({NN_DATATYPE : nnBaseInfo['result'][0]['fields']['preprocess']});
+            //     this.setState({NN_TITLE : nnBaseInfo['result'][0]['fields']['name']});
+            // }
               this.getHeaderSwitch(i);
               
             });  
@@ -135,9 +136,10 @@ export default class HomeComponent extends React.Component {
     }
 
     setNetConfiguration(){
-        if(this.state.NN_DATAVALID && this.state.NN_TYPE != 'cifar'){
-            this.setState({NN_InfoList: <NN_NetworkConfigurationComponent getHeaderEvent={this.getHeaderEvent}/> });  
-        }
+        // if(this.state.NN_DATAVALID && this.state.NN_TYPE != 'cifar'){
+        //     this.setState({NN_InfoList: <NN_NetworkConfigurationComponent getHeaderEvent={this.getHeaderEvent}/> });  
+        // }
+        this.setState({NN_InfoList: <NN_InfoNewComponent getHeaderEvent={this.getHeaderEvent}/> }); 
     }
 
     getTimeStatistics(){

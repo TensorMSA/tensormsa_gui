@@ -35,14 +35,15 @@ export default class NN_HeaderComponent extends React.Component {
             	}
 				break;
             case 4:
-            	if(this.context.NN_DATAVALID && this.context.NN_TYPE != 'cifar'){
-            		return this.props.getHeaderEvent(4);
-            	} else {
-					if (!this.context.NN_DATAVALID) {
-						msg.show("데이터가 유효하지 않습니다.")
-					}
-				}
-				break;
+            	return this.props.getHeaderEvent(4);
+    //         	if(this.context.NN_DATAVALID && this.context.NN_TYPE != 'cifar'){
+    //         		return this.props.getHeaderEvent(4);
+    //         	} else {
+				// 	if (!this.context.NN_DATAVALID) {
+				// 		msg.show("데이터가 유효하지 않습니다.")
+				// 	}
+				// }
+				// break;
             case 5:
             	if(this.context.NN_CONFIG && this.context.NN_TYPE != 'cifar'){
 	                return this.props.getHeaderEvent(5); 
@@ -110,9 +111,9 @@ export default class NN_HeaderComponent extends React.Component {
 					<h1 className="hidden">Navigator</h1>
 					<ul>
 						<li className={this.isActive(1)}><a href="#" onClick={this.setFilter.bind(this, 1)}>Net Info</a></li>
-						<li className={this.isActive(2)}><a href="#" onClick={this.setFilter.bind(this, 2)}>Pre Process</a></li>
+						<li className={this.isActive(2)}><a href="#" onClick={this.setFilter.bind(this, 2)}>Net Detail</a></li>
 						<li className={this.isActive(3)}><a href="#" onClick={this.setFilter.bind(this, 3)}>Data Process</a></li>
-						<li className={this.isActive(4)}><a href="#" onClick={this.setFilter.bind(this, 4)}>Net conf</a></li>  
+						<li className={this.isActive(4)}><a href="#" onClick={this.setFilter.bind(this, 4)}>Net Create</a></li>  
 						<li className={this.isActive(5)}><a href="#" onClick={this.setFilter.bind(this, 5)}>Train Statistics</a></li>
 						<li className={this.isActive(6)}><a href="#" onClick={this.setFilter.bind(this, 6)}>Predict Test</a></li>
 					</ul>

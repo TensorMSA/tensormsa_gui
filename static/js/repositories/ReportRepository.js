@@ -3,6 +3,11 @@ export default class ReportRepository {
         this.api = api;
     }
 
+    log(title, data){
+        console.log(title+"...............................");
+        console.log(data)
+    }
+
     getConfigs(param) {
         return this.api.get('/config/nn/${param}/param').then((data) => {
             return data;
@@ -17,42 +22,82 @@ export default class ReportRepository {
         });
     }
 
-    getCommonNNInfoNew(opt_url, params) {
-        return this.api.get('/api/v1/type/automl/state/rule/graph_id/all/', '').then((data) => {
-            data = JSON.parse(data);
-            console.log("getCommonNNInfoNew===========");
-            console.log(data)
-            console.log("==========================");
-           return data;
-        });
-    }
-
     getCommonNNInfo(params) {
         return this.api.get('/api/v1/type/common/target/nninfo/nnid/all/', '').then((data) => {
             data = JSON.parse(data);
-            console.log("getCommonNNInfo===========");
-            console.log(data)
-            console.log("==========================");
+            this.log("getCommonNNInfo", data)
             return data;
+        });
+    }
+
+    getCommonNNInfoAuto(params) {
+        return this.api.get('/api/v1/type/automl/state/rule/graph_id/'+params+'/', '').then((data) => {
+            data = JSON.parse(data);
+            this.log("getCommonNNInfoAuto", data)
+           return data;
         });
     }
 
     putCommonNNInfo(params, jsonData) {
         return this.api.put('/api/v1/type/common/target/nninfo/nnid/'+params+'/', jsonData).then((data) => {
-            console.log("putCommonNNInfo===========");
-            console.log(data)
-            console.log("==========================");
+            this.log("putCommonNNInfo", data)
             return data;
         });
     }
 
-    postCommonNNInfo(opt_url, id, params) {
-        let url='/api/v1/type/common/nninfo/';
-        params["nn_id"] = id;
-        return this.api.post(url, params).then((data) => {
+    postCommonNNInfo(params, jsonData) {
+        return this.api.post('/api/v1/type/common/target/nninfo/nnid/'+params+'/', jsonData).then((data) => {
             data = JSON.parse(data);
-            console.log(data);
-           return data;
+            this.log("postCommonNNInfo", data)
+            return data;
+        });
+    }
+
+    postCommonNNInfoWF(params, jsonData) {
+        return this.api.post('/api/v1/type/common/target/nninfo/nnid/'+params+'/version/', jsonData).then((data) => {
+            data = JSON.parse(data);
+            this.log("postCommonNNInfoWF", data)
+            return data;
+        });
+    }
+
+    putCommonNNInfoWF(nn_id, wf_ver_id, jsonData) {
+        return this.api.put('/api/v1/type/common/target/nninfo/nnid/'+nn_id+'/version/', jsonData).then((data) => {
+            data = JSON.parse(data);
+            this.log("putCommonNNInfoWF", data)
+            return data;
+        });
+    }
+
+    postCommonNNInfoWFNode(nn_id, wf_ver_id, jsonData) {
+        return this.api.post('/api/v1/type/wf/target/init/mode/simple/'+nn_id+'/wfver/'+wf_ver_id+'/', jsonData).then((data) => {
+            data = JSON.parse(data);
+            this.log("postCommonNNInfoWFNode", data)
+            return data;
+        });
+    }
+
+    putCommonNetConf(nn_id, wf_ver_id, net_type, conf_type, jsonData) {
+        return this.api.put('/api/v1/type/wf/state/netconf/detail/'+net_type+'/nnid/'+nn_id+'/ver/'+wf_ver_id+'/node/'+conf_type+'/', jsonData).then((data) => {
+            data = JSON.parse(data);
+            this.log("putCommonNetConf", data)
+            return data;
+        });
+    }
+
+    putCommonDataConf(nn_id, wf_ver_id, data_Type, conf_type, jsonData) {
+        return this.api.put('/api/v1/type/wf/state/'+data_Type+'/src/local/form/file/prg/source/nnid/'+nn_id+'/ver/'+wf_ver_id+'/node/'+conf_type+'/', jsonData).then((data) => {
+            data = JSON.parse(data);
+            this.log("putCommonDataConf", data)
+            return data;
+        });
+    }
+
+    putCommonFeedConf(nn_id, wf_ver_id, net_type, conf_type, jsonData) {
+        return this.api.put('/api/v1/type/wf/state/pre/detail/feed/src/frame/net/'+net_type+'/nnid/'+nn_id+'/ver/'+wf_ver_id+'/node/'+conf_type+'/', jsonData).then((data) => {
+            data = JSON.parse(data);
+            this.log("putCommonFeedConf", data)
+            return data;
         });
     }
 
@@ -76,7 +121,7 @@ export default class ReportRepository {
         return this.api.get(`/api/v1/type/cnn/config/`, params).then((data) => {
            return data;
         });
-    }J
+    }
 
     putConfigNnCnn(params) {
         return this.api.put(`/api/v1/type/cnn/config/`, params).then((data) => {

@@ -50,6 +50,7 @@ export default class NN_InfoListComponent extends React.Component {
         let nn_id = ''
         let bc = ''
         let bc_sub = ''
+        let bc_title = ''
         let bc_desc = ''
         console.log(this.refs.table.state.selectedRowKeys )
         for (var i in this.refs.table.state.data) {
@@ -57,10 +58,12 @@ export default class NN_InfoListComponent extends React.Component {
                 nn_id = this.refs.table.state.data[i].nn_id
                 bc = this.refs.table.state.data[i].biz_cate
                 bc_sub = this.refs.table.state.data[i].biz_sub_cate
+                bc_title = this.refs.table.state.data[i].nn_title
                 bc_desc = this.refs.table.state.data[i].nn_desc
             }
         }
-        params = { biz_cate : bc, biz_sub_cate : bc_sub, nn_desc :bc_desc }
+        
+        params = { biz_cate : bc, biz_sub_cate : bc_sub, nn_title: bc_title, nn_desc :bc_desc }
         this.props.reportRepository.putCommonNNInfo(nn_id, params).then((tableData) => {
             this.getCommonNNInfo();
         });
@@ -94,7 +97,7 @@ export default class NN_InfoListComponent extends React.Component {
         }
 
         const cellEditProp = {
-            mode: 'dbclick',
+            mode: 'click',
             blurToSave: true
         }
 
@@ -102,6 +105,15 @@ export default class NN_InfoListComponent extends React.Component {
             console.log("row info : " + row.nn_id)
             console.log(this.thisClass.props )
             console.log(this.thisClass.getCommonNNInfo )
+            this.thisClass.props.setActiveItem(row.nn_id,
+                                               row.key,
+                                               row.type,
+                                               row.datavaild,
+                                               row.config,
+                                               row.confvaild,
+                                               row.train,
+                                               row.preprocess,
+                                               row.name);
         }
 
         function deleteFormatter(cell, row, props) {
@@ -140,12 +152,13 @@ export default class NN_InfoListComponent extends React.Component {
         //                     editable={ false } >Modify</TableHeaderColumn>
         // <TableHeaderColumn dataField='nn_id' dataFormat={ trainFormatter }  dataAlign='center' 
         //                     editable={ false } >Train</TableHeaderColumn>
+        // <button type="button" className="addnew" onClick={() => this.trainCommonNNInfo()} >Train</button>
         return (
             <section>
                 <h1 className="hidden">tensor MSA main table</h1>
                 <div className="container paddingT10">
                     <div className="tblBtnArea">
-                        <button type="button" className="addnew" onClick={() => this.trainCommonNNInfo()} >Train</button>
+                        
                         <button type="button" className="addnew" onClick={() => this.addCommonNNInfo() } >Add New</button>
                     </div>
 
@@ -169,14 +182,19 @@ export default class NN_InfoListComponent extends React.Component {
         multiColumnSort={ 3 } 
         selectRow={selectRowProp}
         cellEdit={ cellEditProp } 
+        search = {true}
+        multiColumnSearch={true}
+        data-resizable = {true}
         >
         
         <TableHeaderColumn dataField="biz_cate" dataSort={ true } headerAlign='center' dataAlign='center' 
-                            filter={ { type: 'TextFilter', delay: 1000 } }>Category</TableHeaderColumn>
+                            >Category</TableHeaderColumn>
         <TableHeaderColumn dataField="biz_sub_cate" dataSort={ true } headerAlign='center' dataAlign='center' 
-                            filter={ { type: 'TextFilter', delay: 1000 } }>SubCategory</TableHeaderColumn>
+                            >SubCategory</TableHeaderColumn>
+        <TableHeaderColumn dataField="nn_title" dataSort={ true } headerAlign='center' dataAlign='center' 
+                            >Title</TableHeaderColumn>
         <TableHeaderColumn dataField="nn_desc" dataSort={ true } headerAlign='center' dataAlign='center' 
-                            filter={ { type: 'TextFilter', delay: 1000 } }>Description</TableHeaderColumn>
+                            >Description</TableHeaderColumn>
 
         <TableHeaderColumn dataField="nn_id" dataSort={ true } headerAlign='center' dataAlign='center' 
                             isKey={true} >ID</TableHeaderColumn>
