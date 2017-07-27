@@ -32,17 +32,20 @@ export default class NN_InfoListComponent extends React.Component {
 
     deleteCommonNNInfo(params) {
         let nn_id = ''
-        for (var i in this.refs.table.state.data) {
-            if (this.refs.table.state.selectedRowKeys == this.refs.table.state.data[i].nn_id){
-                nn_id = this.refs.table.state.data[i].nn_id
-            }
-        }
-        console.log(nn_id)
-        params = { use_flag : 'N' }
-        this.props.reportRepository.putCommonNNInfo(nn_id, params).then((tableData) => {
-            this.getCommonNNInfo();
-        });
+        let re = confirm( "Are you delete?" )
 
+        if(re == true){
+            for (var i in this.refs.table.state.data) {
+                if (this.refs.table.state.selectedRowKeys == this.refs.table.state.data[i].nn_id){
+                    nn_id = this.refs.table.state.data[i].nn_id
+                }
+            }
+            console.log(nn_id)
+            params = { use_flag : 'N' }
+            this.props.reportRepository.putCommonNNInfo(nn_id, params).then((tableData) => {
+                this.getCommonNNInfo();
+            });
+        }
     }
 
 
@@ -52,21 +55,24 @@ export default class NN_InfoListComponent extends React.Component {
         let bc_sub = ''
         let bc_title = ''
         let bc_desc = ''
-        console.log(this.refs.table.state.selectedRowKeys )
-        for (var i in this.refs.table.state.data) {
-            if (this.refs.table.state.selectedRowKeys == this.refs.table.state.data[i].nn_id){
-                nn_id = this.refs.table.state.data[i].nn_id
-                bc = this.refs.table.state.data[i].biz_cate
-                bc_sub = this.refs.table.state.data[i].biz_sub_cate
-                bc_title = this.refs.table.state.data[i].nn_title
-                bc_desc = this.refs.table.state.data[i].nn_desc
+        let re = confirm( "Are you update?" )
+        if(re == true){
+            console.log(this.refs.table.state.selectedRowKeys )
+            for (var i in this.refs.table.state.data) {
+                if (this.refs.table.state.selectedRowKeys == this.refs.table.state.data[i].nn_id){
+                    nn_id = this.refs.table.state.data[i].nn_id
+                    bc = this.refs.table.state.data[i].biz_cate
+                    bc_sub = this.refs.table.state.data[i].biz_sub_cate
+                    bc_title = this.refs.table.state.data[i].nn_title
+                    bc_desc = this.refs.table.state.data[i].nn_desc
+                }
             }
+            
+            params = { biz_cate : bc, biz_sub_cate : bc_sub, nn_title: bc_title, nn_desc :bc_desc }
+            this.props.reportRepository.putCommonNNInfo(nn_id, params).then((tableData) => {
+                this.getCommonNNInfo();
+            });
         }
-        
-        params = { biz_cate : bc, biz_sub_cate : bc_sub, nn_title: bc_title, nn_desc :bc_desc }
-        this.props.reportRepository.putCommonNNInfo(nn_id, params).then((tableData) => {
-            this.getCommonNNInfo();
-        });
     }
 
     trainCommonNNInfo(params) {
@@ -80,6 +86,7 @@ export default class NN_InfoListComponent extends React.Component {
 
     addCommonNNInfo(params) {
         console.log(this.refs.table.state.selectedRowKeys)
+        return this.props.getHeaderEvent(4); //call Net Info
         // this.setState({<NN_InfoNewComponent /> });   
     }
 
