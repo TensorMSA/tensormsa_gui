@@ -101,7 +101,8 @@ export default class Api {
                 mode: "cors",
                 body: JSON.stringify(params),
                 headers: new Headers({
-                    'Accept': 'application/json'
+                    'Accept': 'application/json',
+                    'Content-type':'application/json'
                 })
             }
         ).then(function(response) {

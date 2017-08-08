@@ -1,9 +1,17 @@
 import React from 'react';
 import Api from './../utils/Api'
 import Modal from 'react-modal';
+import EnvConstants from './../constants/EnvConstants';
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 
 import ReportRepository from './../repositories/ReportRepository'
+import FileUploadProgress  from 'react-fileupload-progress';
+
+const FileUpload = require('react-fileupload');
+import { Line, Circle } from 'rc-progress';
+import {findDOMNode} from 'react-dom'
+import ReactTooltip from 'react-tooltip'
+import ToolTip from 'react-portal-tooltip'
 
 
 export default class NN_InfoNewComponent extends React.Component {
@@ -14,20 +22,62 @@ export default class NN_InfoNewComponent extends React.Component {
             NN_TableMaster: null,
             NN_TableData: null,
             NN_TableDataDetail : null,
-            selModalView: null,
             nn_id : null,
             wf_ver_id : null,
-            stepBack : 1,
-            stepForward : 2,
             color : "red",
             arrayData : "[ ]",
-            jsonData : "{ }"
+            jsonData : "{ }",
+            tmpFilePathTrain : "1",
+            tmpFilePathEval : "1",
+            tmpFilePathTrainData : null,
+            tmpFilePathEvalData : null,
+            percent:0,//File Upload percent
+            lineviewTrain:false,//File Upload Line
+            lineviewEval:false,//File Upload Lin
+            isViewImage: false,//Net Select Image view
+            isViewImageDetail : null,//Net Select Image view
+            netType : null
         };
+        this.getTmpFilePathTrain = this.getTmpFilePathTrain.bind(this);
+        this.getTmpFilePathEval = this.getTmpFilePathEval.bind(this);
+        this._handleUploadingTrain = this._handleUploadingTrain.bind(this);
+        this._handleUploadingEval = this._handleUploadingEval.bind(this);
+        this.optTmpFilePathTrain={
+            baseUrl:EnvConstants.getApiServerUrl() + '/api/v1/type/wf/state/data/detail/upload/file/nnid/tmpFilePathTrain/ver/1/dir/'+this.state.tmpFilePathTrain+'/',
+            param:{
+                fid:0
+            }
+            ,chooseAndUpload : true
+            ,multiple : true
+            ,uploadSuccess : this.getTmpFilePathTrain
+            ,uploading: this._handleUploadingTrain
+        };
+
+        this.optTmpFilePathEval={
+            baseUrl:EnvConstants.getApiServerUrl() + '/api/v1/type/wf/state/data/detail/upload/file/nnid/tmpFilePathEval/ver/1/dir/'+this.state.tmpFilePathEval+'/',
+            param:{
+                fid:0
+            }
+            ,chooseAndUpload : true
+            ,multiple : true
+            ,uploadSuccess : this.getTmpFilePathEval
+            ,uploading: this._handleUploadingEval
+        } ;
+        
     }
 
     // 최초 1회 실행하여 Network Config List를 가져온다.
     componentDidMount(){
         this.getCommonNNInfoAuto('all');
+        // 파일 임시 저장소를 만들어 가져와 준다.
+        this.props.reportRepository.getFileUploadPath("tmpFilePathTrain", "1", "1").then((tableData) => {
+            this.setState({ tmpFilePathTrain : tableData["path"]})
+            this.optTmpFilePathTrain.baseUrl = EnvConstants.getApiServerUrl() + '/api/v1/type/wf/state/data/detail/upload/file/nnid/tmpFilePathTrain/ver/1/dir/'+this.state.tmpFilePathTrain+'/'
+        });
+        this.props.reportRepository.getFileUploadPath("tmpFilePathEval", "1", "1").then((tableData) => {
+            this.setState({ tmpFilePathEval : tableData["path"]})
+            this.optTmpFilePathEval.baseUrl  = EnvConstants.getApiServerUrl() + '/api/v1/type/wf/state/data/detail/upload/file/nnid/tmpFilePathEval/ver/1/dir/'+this.state.tmpFilePathEval+'/'
+        });
     }
 
     // get Network List ex)wdnn, resnet, charcnn_csv    
@@ -39,16 +89,48 @@ export default class NN_InfoNewComponent extends React.Component {
 
     // get Network config list ex)netconf_node, dataconf_node
     getCommonNNInfoAutoDetail(row){
-        this.props.reportRepository.getCommonNNInfoAuto(row.id).then((tableData) => {
+        this.props.reportRepository.getCommonNNInfoAuto(row).then((tableData) => {
             this.setState({ NN_TableDataDetail: tableData })
         });
+    }
+
+    _handleUploadingTrain(progress, mill){
+        this.state.lineviewTrain = true
+        let per = Math.round(progress.loaded/progress.total * 100)
+        this.setState({ percent : per})
+        if(progress.total == 0){
+            this.state.lineviewTrain = false
+        }
+    }
+
+    _handleUploadingEval(progress, mill){
+        this.state.lineviewEval = true
+        let per = Math.round(progress.loaded/progress.total * 100)
+        this.setState({ percent : per})
+        if(progress.total == 0){
+            this.state.lineviewEval = false
+        }
+    }
+
+    getTmpFilePathTrain(){
+        console.log("getTmpFilePathTrain()")
+        this.props.reportRepository.getFileUploadPath("tmpFilePathTrain", "list", this.state.tmpFilePathTrain).then((tableData) => {
+                                        this.setState({ tmpFilePathTrainData : tableData})
+                                    });
+    }
+
+    getTmpFilePathEval(){
+        console.log("getTmpFilePathEval()") 
+        this.props.reportRepository.getFileUploadPath("tmpFilePathEval", "list", this.state.tmpFilePathEval).then((tableData) => {
+                                        this.setState({ tmpFilePathEvalData : tableData})
+                                    });
     }
 
     // getConfigData에서 Table 값을 가져와 로우 단위로 값을 편성하여 Json을 만들기 쉽게 하기 위함이다.
     setConfigData(data){
         let redata = []
         let childcnt = data.childElementCount // Table Cell Child Count
-        let text = data.textContent.trim() // Table Cell Text
+        let text = data.textContent.trim() // Table Cell Text innerText
         let rowspan = data.rowSpan // Table Cell RowSpan
         let edit = data.contentEditable // Table Cell Editable
         let type = data.getAttribute("type") // Table Last Cell Type ex) number, string
@@ -202,7 +284,7 @@ export default class NN_InfoNewComponent extends React.Component {
             if(input_data == null || input_data == ""){ alert( title + " is not exist." );return; flag = "F"; break;}
         }
 
-        let netType = this.refs.master2.state.selectedRowKeys
+        let netType = this.state.netType
         if(flag == "T" && (netType == null || netType == "")){ 
             alert( "Select a Network Type") 
             return
@@ -235,19 +317,50 @@ export default class NN_InfoNewComponent extends React.Component {
         // Make NN WF Node Info
         let nodeparam = {}
         nodeparam["type"] = netType
+        let desc = ""
 
-        // let nn_id = "nn00000025"
-        // let wf_ver_id = "1"
+        let trainfile = this.state.tmpFilePathTrain
+        let evalfile = this.state.tmpFilePathEval
 
-        // Make NN Info
-        this.props.reportRepository.postCommonNNInfo("", dparam).then((nn_id) => {
-            // Make NN WF Info
-            this.props.reportRepository.postCommonNNInfoWF(nn_id, wfparam).then((wf_ver_id) => {
-                // Make NN WF Node Info
-                this.props.reportRepository.postCommonNNInfoWFNode(nn_id, wf_ver_id, nodeparam).then((tableData) => {
-                });
-            });
-        });
+        let tfparam = {}
+        tfparam["type"] = "tmpFilePathTrain"
+        tfparam["path"] = trainfile
+
+        let efparam = {}
+        efparam["type"] = "tmpFilePathEval"
+        efparam["path"] = evalfile
+
+        let nn_id = "nn00000001"
+        let wf_ver_id = "1"
+
+
+        // // Make NN Info
+        // this.props.reportRepository.postCommonNNInfo("", dparam).then((nn_id) => {
+        //     this.setState({ nn_id: nn_id })
+        //     // Make NN WF Info
+        //     this.props.reportRepository.postCommonNNInfoWF(nn_id, wfparam).then((wf_ver_id) => {
+        //         this.setState({ wf_ver_id: wf_ver_id })
+        //         // Make NN WF Node Info
+        //         this.props.reportRepository.postCommonNNInfoWFNode(nn_id, wf_ver_id, nodeparam).then((tableData) => {
+        //             // Train File Save
+        //             desc = "train_data"
+        //             this.props.reportRepository.getCommonNodeInfo(nn_id, wf_ver_id, desc).then((tableData) => {
+        //                 desc = tableData[0]["fields"]["nn_wf_node_name"]
+        //                 this.props.reportRepository.putFileUpload(nn_id, wf_ver_id, desc, tfparam).then((tableData) => {
+        //                 });
+        //             });
+
+        //             // Eval File Save
+        //             desc = "eval_data"
+        //             this.props.reportRepository.getCommonNodeInfo(nn_id, wf_ver_id, desc).then((tableData) => {
+        //                 desc = tableData[0]["fields"]["nn_wf_node_name"]
+        //                 this.props.reportRepository.putFileUpload(nn_id, wf_ver_id, desc, efparam).then((tableData) => {
+        //                 });
+        //             });
+
+        //         });
+        //     });
+        // });
                 
     }
 
@@ -256,7 +369,52 @@ export default class NN_InfoNewComponent extends React.Component {
 
     }
 
+    handleChangeRadio(selectedValue){
+        let value = selectedValue.target.value //radio button cell
+        if(value == undefined && selectedValue.target.attributes[0] != undefined){// key, desc cell
+            value = selectedValue.target.attributes[0].value
+            for(let i=1 ; i < this.refs.master2.rows.length ; i++){
+                let key = this.refs.master2.rows[i].children[0].children.rd1
+                if(key.value == value){
+                    key.checked = true
+                }
+            }
+        }
+        this.state.netType = value
+
+        this.getCommonNNInfoAutoDetail(value);
+    }
+
+    fileDeleteTrain(value){
+        let tfparam = {}
+        tfparam["filename"] = value.target.alt
+        this.props.reportRepository.deleteFileUploadPath("tmpFilePathTrain", "1", this.state.tmpFilePathTrain, tfparam).then((tableData) => {
+                                                this.getTmpFilePathTrain()
+                                                });
+    }
+
+    fileDeleteEval(value){
+        let tfparam = {}
+        tfparam["filename"] = value.target.alt
+        this.props.reportRepository.deleteFileUploadPath("tmpFilePathEval", "1", this.state.tmpFilePathEval, tfparam).then((tableData) => {
+                                                this.getTmpFilePathEval()
+                                                });
+    }
+
+    viewNetImage(value){
+        let url = "./images/"+value.target.alt+".png"
+        if(this.state.isViewImage == true && this.state.isViewImageDetail == url){
+            this.setState({ isViewImage: false })
+            this.setState({ isViewImageDetail: null })
+        }else{
+            this.setState({ isViewImage: true })
+            this.setState({ isViewImageDetail: url })
+        }
+    }
+
+
     render() {
+        let k = 1
         /////////////////////////////////////////////////////////////////////////////////////////
         // First Network Default
         /////////////////////////////////////////////////////////////////////////////////////////
@@ -275,26 +433,103 @@ export default class NN_InfoNewComponent extends React.Component {
                                          ];
         }
         nnInfoDefault = this.state.NN_TableMaster
+        
+
         /////////////////////////////////////////////////////////////////////////////////////////
-        // Second Network List
+        // fileupload
         /////////////////////////////////////////////////////////////////////////////////////////
-        const options = {//Table Sort
-            defaultSortName: 'id',
-            defaultSortOrder: 'asc'
+        const containerStyle = {
+            width: '100%'
+        };
+
+        let listTmpFilePathTrain = []
+        if (this.state.tmpFilePathTrainData != null) {
+            listTmpFilePathTrain = this.state.tmpFilePathTrainData
         }
 
-        const selectRowProp = {//Table Select Row
-            mode: 'radio',
-            clickToSelect: true,
-            onSelect: onSelectRow,
-            thisClass : this
+        let listTmpFilePathEval = []
+        if (this.state.tmpFilePathEvalData != null) {
+            listTmpFilePathEval = this.state.tmpFilePathEvalData
         }
 
-        const jsonData = this.state.jsonData
-        const arrayData = this.state.arrayData
+        // Train File upload Header
+        let tableHeaderTF = []; //make header
+        let colDatasTF = ["Train File Name", "Del"]
+        let headerDataTF = []
+        for (let i=0;i < colDatasTF.length;i++){
+            headerDataTF.push(<th key={k++} style={{"text-align":"center"}} >{colDatasTF[i]}</th>)
+        }
+        
+        tableHeaderTF.push(<tr key={k++} >{headerDataTF}</tr>)
 
-        function onSelectRow(row) {//Network 가 선택 될 때 마다 값이 변경 되어야 한다. ex)cnn, wcnn, wdnn....
-            this.thisClass.getCommonNNInfoAutoDetail(row);
+        // Eval File upload Header
+        let tableHeaderEF = []; //make header
+        let colDatasEF = ["Train File Name", "Del"]
+        let headerDataEF = []
+        for (let i=0;i < colDatasEF.length;i++){
+            headerDataEF.push(<th key={k++} style={{"text-align":"center"}} >{colDatasEF[i]}</th>)
+        }
+        
+        tableHeaderEF.push(<tr key={k++} >{headerDataEF}</tr>)
+
+        //Train File Upload Data
+        let tableDataTF = []; // make tabledata
+        for(let rows in listTmpFilePathTrain){
+            let colDataTF = [];
+            let row = listTmpFilePathTrain[rows]
+
+            for(let cols in row){
+                colDataTF.push(<td key={k++} > {row[cols]} </td>) 
+            }
+
+            //add delete image
+            if(row["filename"] != null){
+                colDataTF.push(<td key={k++} > <img style ={{width:20, "cursor":"pointer"}} alt = {row["filename"]}
+                                                    onClick={this.fileDeleteTrain.bind(this)} 
+                                                    src="./images/del.png" /></td>)
+            }
+            
+            tableDataTF.push(<tr key={k++}>{colDataTF}</tr>)
+        }
+
+
+        let fileTableTF = []
+        fileTableTF.push(<thead ref='thead' key={k++} className="center">{tableHeaderTF}</thead>)
+        fileTableTF.push(<tbody ref='tbody' key={k++} className="center" >{tableDataTF}</tbody>)
+
+        //Eval File Upload Data
+        let tableDataEF = []; // make tabledata
+        for(let rows in listTmpFilePathEval){
+            let colDataEF = [];
+            let row = listTmpFilePathEval[rows]
+
+            for(let cols in row){
+                colDataEF.push(<td key={k++} > {row[cols]} </td>) 
+            }
+
+            //add delete image
+            if(row["filename"] != null){
+                colDataEF.push(<td key={k++} > <img style ={{width:20, "cursor":"pointer"}} alt = {row["filename"]}
+                                                    onClick={this.fileDeleteEval.bind(this)} 
+                                                    src="./images/del.png" /></td>)
+            }
+
+            tableDataEF.push(<tr key={k++}>{colDataEF}</tr>)
+        }
+
+
+        let fileTableEF = []
+        fileTableEF.push(<thead ref='thead' key={k++} className="center">{tableHeaderEF}</thead>)
+        fileTableEF.push(<tbody ref='tbody' key={k++} className="center" >{tableDataEF}</tbody>)
+        
+        /////////////////////////////////////////////////////////////////////////////////////////
+        // Select Network List
+        /////////////////////////////////////////////////////////////////////////////////////////
+        function sortByKey(array, key) {
+            return array.sort(function(a, b) {
+                var x = a[key]; var y = b[key];
+                return ((x < y) ? -1 : ((x > y) ? 1 : 0));
+            });
         }
 
         // Network List
@@ -304,9 +539,48 @@ export default class NN_InfoNewComponent extends React.Component {
                 nnInfoNewList[i] = {id:this.state.NN_TableData[i]["pk"], desc:this.state.NN_TableData[i]["fields"]["graph_flow_desc"]};
             }
         }
+        nnInfoNewList = sortByKey(nnInfoNewList, 'id');
+
+        // Network Select Header
+        let tableHeaderSL = []; //make header
+        let colDatasSL = ["Sel", "Network", "Description", "Image"]
+        let headerDataSL = []
+        for (let i=0;i < colDatasSL.length;i++){
+            headerDataSL.push(<th key={k++} style={{"text-align":"center"}} >{colDatasSL[i]}</th>)
+        }
+        
+        tableHeaderSL.push(<tr key={k++} >{headerDataSL}</tr>)
+
+        //Network Select Data
+        let tableDataSL = []; // make tabledata
+        for(let rows in nnInfoNewList){
+            let colDataSL = [];
+            let row = nnInfoNewList[rows]
+
+            colDataSL.push(<td key={k++} > < input type = "radio" name="rd1"
+                                                                    value = {row["id"]}
+                                                                    onClick={this.handleChangeRadio.bind(this)} 
+                                                                    style={{"text-align":"center"}} />  </td>)
+            colDataSL.push(<td key={k++} value = {row["id"]} onClick={this.handleChangeRadio.bind(this)} > {row["id"]} </td>) 
+            colDataSL.push(<td key={k++} value = {row["id"]} style={{"text-align":"left"}} onClick={this.handleChangeRadio.bind(this)} > {row["desc"]} </td>) 
+            let clickUrl = "./images/ico_help.png"
+            colDataSL.push(<td key={k++} > <img style ={{width:20, "cursor":"pointer"}} alt = {row["id"]}
+                                                onClick={this.viewNetImage.bind(this)} 
+                                                src={clickUrl} /></td>)
+
+            tableDataSL.push(<tr key={k++}>{colDataSL}</tr>)
+        }
+
+
+        let nnInfoNewListTable = []
+        nnInfoNewListTable.push(<thead ref='thead' key={k++} className="center">{tableHeaderSL}</thead>)
+        nnInfoNewListTable.push(<tbody ref='tbody' key={k++} className="center" >{tableDataSL}</tbody>)
+
         /////////////////////////////////////////////////////////////////////////////////////////
-        // Third Network Config List
+        // Network Config List
         /////////////////////////////////////////////////////////////////////////////////////////
+        const jsonData = this.state.jsonData
+        const arrayData = this.state.arrayData
         // 테이블 구릅핑에 필요한 수를 넣어준다.
         function setRspanCount(data, colcnt){
             let prev = []
@@ -584,9 +858,8 @@ export default class NN_InfoNewComponent extends React.Component {
         /////////////////////////////////////////////////////////////////////////////////////////
         // NetConf Table Header Make
         /////////////////////////////////////////////////////////////////////////////////////////
-        let k = 1
         let tableHeader = []; //make header
-        let colDatas = ["col1", "col2", "col3", "col4", "col5"]
+        let colDatas = ["col1"]
         if(rNode.colcnt > 0){
             colDatas = []
             for(let i=0;i < rNode.colcnt ; i++){
@@ -678,12 +951,21 @@ export default class NN_InfoNewComponent extends React.Component {
         nnInfoNewListDetailTable.push(<thead ref='thead' key={k++} className="center">{tableHeader}</thead>)
         nnInfoNewListDetailTable.push(<tbody ref='tbody' key={k++} className="center" >{tableData}</tbody>)
 
+
+
+    
+
+
         return (
             <section>
                 <h1 className="hidden">tensor MSA main table</h1>
                 <div className="container paddingT10">
                     <div className="tblBtnArea">
                         <button type="button" className="save" onClick={() => this.saveCommonNNInfoNew()} >Save</button>
+                    </div>
+
+                    <div>
+                        <h1> Network Info </h1>
                     </div>
 
                     <div className="net-info-default">
@@ -703,34 +985,111 @@ export default class NN_InfoNewComponent extends React.Component {
                         </table>
                     </div>
 
-                    <div className="net-info">
-                        <table className="form-table align-left">
-                            <BootstrapTable ref= 'master2' 
-                                data={nnInfoNewList} 
-                                striped={true} 
-                                hover={true} s
-                                condensed={true} 
-                                selectRow={selectRowProp}
-                                options={ options } 
-                                >
-                                
-                                <TableHeaderColumn dataField="id" headerAlign='center' dataAlign='center' isKey={true} >Network</TableHeaderColumn>
-                                <TableHeaderColumn dataField="desc"  headerAlign='center' dataAlign='center' >Description</TableHeaderColumn>
-                               
-                            </BootstrapTable>
+                    <div>
+                        <h1> Network File Upload </h1>
+                    </div>
+
+                    <div >
+                        <FileUpload options={this.optTmpFilePathTrain} >
+                            <button ref="chooseAndUpload" id='filetrain' name = 'train'>TrainFileUpload</button>
+                        </FileUpload>
+
+                        <div>
+                            <table className="table detail" ref= 'master3' >
+                                {fileTableTF}
+                            </table>
+                        </div>
+
+                        {this.state.lineviewTrain ?
+                            <div>
+                                <h3>Line Progress {this.state.percent}%</h3>
+                                <div style={containerStyle}>
+                                  <Line percent={this.state.percent} strokeWidth="1" strokeColor={'#3FC7FA'} />
+                                </div>
+                            </div>
+                            :
+                            <div>
+                            </div>
+                        }
+                    </div>
+
+                    <div> 
+                        <FileUpload options={this.optTmpFilePathEval}>
+                            <button ref="chooseAndUpload" id='fileeval' name = 'eval'>EvalFileUpload</button>
+                        </FileUpload>
+                    </div>
+
+                    <div>
+                        <table className="table detail" ref= 'master3' >
+                            {fileTableEF}
                         </table>
                     </div>
 
+                    {this.state.lineviewEval ?
+                        <div>
+                            <h3>Line Progress {this.state.percent}%</h3>
+                            <div style={containerStyle}>
+                              <Line percent={this.state.percent} strokeWidth="1" strokeColor={'#3FC7FA'} />
+                            </div>
+                        </div>
+                        :
+                        <div>
+                        </div>
+                    }
+
+                    <br></br>
+
+
+
+
+
+
+
+
+                    <div>
+                        <h1> Network Select </h1>
+                    </div>
+
+
+
+
+
+
+
+                    <div>
+                        <table className="table detail" ref= 'master2' >
+                            {nnInfoNewListTable}
+                        </table>
+                    </div>
+
+
+
+
+                    {this.state.isViewImage ?
+                        <div>
+                        <table className="table detail" ref= 'master2_1' >
+                        <tr><td style={{"text-align":"center"}}>
+                            <img src = {this.state.isViewImageDetail} style={{"width":"800"}} />
+                        </td></tr>
+                        </table>
+                        </div>
+                        :
+                        <div>
+                        </div>
+                    }
+
+
+
+
+                    <div>
+                        <h1> Network Config </h1>
+                    </div>
 
                     <div>
                         <table className="table detail" ref= 'master3' >
                             {nnInfoNewListDetailTable}
                         </table>
                     </div>
-                          
-
-                        
-
                 </div>
             </section>
 
@@ -741,4 +1100,7 @@ export default class NN_InfoNewComponent extends React.Component {
 NN_InfoNewComponent.defaultProps = {
     reportRepository: new ReportRepository(new Api())
 };
+
+
+
 

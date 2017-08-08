@@ -77,6 +77,38 @@ export default class ReportRepository {
         });
     }
 
+    getCommonNodeInfo(nn_id, wf_ver_id, desc){
+        return this.api.get('/api/v1/type/wf/target/init/mode/simple/'+nn_id+'/wfver/'+wf_ver_id+'/desc/'+desc+'/', "").then((data) => {
+            data = JSON.parse(data);
+            this.log("getCommonNodeInfo", data)
+            return data;
+        });
+    }
+
+    getFileUploadPath(nn_id, wf_ver_id, dir){
+        return this.api.get('/api/v1/type/wf/state/data/detail/upload/file/nnid/'+nn_id+'/ver/'+wf_ver_id+'/dir/'+dir+'/').then((data) => {
+            data = JSON.parse(data);
+            this.log("getFileUploadPath:"+nn_id, data)
+            return data;
+        });
+    }
+
+    putFileUpload(nn_id, wf_ver_id, dir, jsonData){
+        return this.api.put('/api/v1/type/wf/state/data/detail/upload/file/nnid/'+nn_id+'/ver/'+wf_ver_id+'/dir/'+dir+'/', jsonData).then((data) => {
+            data = JSON.parse(data);
+            this.log("putFileUpload", data)
+            return data;
+        });
+    }
+
+    deleteFileUploadPath(nn_id, wf_ver_id, dir, jsonData){
+        return this.api.delete('/api/v1/type/wf/state/data/detail/upload/file/nnid/'+nn_id+'/ver/'+wf_ver_id+'/dir/'+dir+'/', jsonData).then((data) => {
+            data = JSON.parse(data);
+            this.log("deleteFileUploadPath", data)
+            return data;
+        });
+    }
+
     putCommonNetConf(nn_id, wf_ver_id, net_type, conf_type, jsonData) {
         return this.api.put('/api/v1/type/wf/state/netconf/detail/'+net_type+'/nnid/'+nn_id+'/ver/'+wf_ver_id+'/node/'+conf_type+'/', jsonData).then((data) => {
             data = JSON.parse(data);

@@ -30,9 +30,9 @@ export default class NN_HeaderComponent extends React.Component {
             	}
 				break;
             case 3:
-            	if(this.context.NN_ID && this.context.NN_TYPE != 'cifar'){
+            	// if(this.context.NN_ID && this.context.NN_TYPE != 'cifar'){
             		return this.props.getHeaderEvent(3);
-            	}
+            	// }
 				break;
             case 4:
             	return this.props.getHeaderEvent(4);

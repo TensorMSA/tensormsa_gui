@@ -130,9 +130,9 @@ export default class HomeComponent extends React.Component {
     }
     
     setDataConfiguration(){
-        if(this.state.NN_ID && this.state.NN_TYPE != 'cifar'){
+        // if(this.state.NN_ID && this.state.NN_TYPE != 'cifar'){
             this.setState({NN_InfoList: <NN_DataConfigurationComponent getHeaderEvent={this.getHeaderEvent}/> });   
-        }
+        // }
     }
 
     setNetConfiguration(){
