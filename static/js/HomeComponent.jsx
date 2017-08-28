@@ -14,6 +14,7 @@ import NN_PreProcessingComponent from './NNConfiguration/NN_PreProcessingCompone
 import ReportRepository from './repositories/ReportRepository';
 import Api from './utils/Api';
 import NN_InfoNewComponent from './NNConfiguration/NN_InfoNewComponent'
+import NN_InfoDetailComponent from './NNConfiguration/NN_InfoDetailComponent'
 
 export default class HomeComponent extends React.Component {
     constructor(props) {
@@ -74,7 +75,7 @@ export default class HomeComponent extends React.Component {
     getHeaderEvent(i){
 
         if(this.state.NN_ID){
-            this.props.reportRepository.getNetBaseInfo(this.state.NN_ID).then((nnBaseInfo) => {
+            this.props.reportRepository.getCommonNNInfo(this.state.NN_ID).then((nnBaseInfo) => {
             //   if(nnBaseInfo && nnBaseInfo.length > 0){
             //     this.setState({NN_TYPE : nnBaseInfo['result'][0]['fields']['type']});
             //     this.setState({NN_DATAVALID : nnBaseInfo['result'][0]['fields']['datavaild']});
@@ -99,7 +100,8 @@ export default class HomeComponent extends React.Component {
           case 1:
               return this.getNetInfo();
           case 2:
-              return this.getPreProcessing(); 
+              // return this.getPreProcessing(); 
+              return this.getNetDetailInfo();
           case 3:
               return this.setDataConfiguration();  
           case 4:
@@ -124,9 +126,15 @@ export default class HomeComponent extends React.Component {
     }
 
     getPreProcessing(){
-        if(this.state.NN_ID && this.state.NN_TYPE != 'cifar'){
-            this.setState({NN_InfoList: <NN_PreProcessingComponent getHeaderEvent={this.getHeaderEvent}/> });  
-        } 
+        // if(this.state.NN_ID){
+            this.setState({NN_InfoList: <NN_PreProcessingComponent getHeaderEvent={this.getHeaderEvent} nn_id={this.state.NN_ID}/> });  
+        // } 
+    }
+
+    getNetDetailInfo(){
+        // if(this.state.NN_ID){
+            this.setState({NN_InfoList: <NN_InfoDetailComponent getHeaderEvent={this.getHeaderEvent} nn_id={this.state.NN_ID}/> });  
+        // } 
     }
     
     setDataConfiguration(){
@@ -139,7 +147,7 @@ export default class HomeComponent extends React.Component {
         // if(this.state.NN_DATAVALID && this.state.NN_TYPE != 'cifar'){
         //     this.setState({NN_InfoList: <NN_NetworkConfigurationComponent getHeaderEvent={this.getHeaderEvent}/> });  
         // }
-        this.setState({NN_InfoList: <NN_InfoNewComponent getHeaderEvent={this.getHeaderEvent}/> }); 
+        this.setState({NN_InfoList: <NN_InfoNewComponent getHeaderEvent={this.getHeaderEvent} setActiveItem={this.setActiveItem} /> }); 
     }
 
     getTimeStatistics(){

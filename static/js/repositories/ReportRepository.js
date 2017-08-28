@@ -4,37 +4,16 @@ export default class ReportRepository {
     }
 
     log(title, data){
-        console.log(title+"...............................");
+        console.log(title+"....................................");
         console.log(data)
     }
 
-    getConfigs(param) {
-        return this.api.get('/config/nn/${param}/param').then((data) => {
+    //Network Info
+    postCommonNNInfo(params, jsonData) {
+        return this.api.post('/api/v1/type/common/target/nninfo/nnid/'+params+'/', jsonData).then((data) => {
+            data = JSON.parse(data);
+            this.log("postCommonNNInfo", data)
             return data;
-        });
-    }
-
-    getNetBaseInfo(opt_url, params) {
-        let url='/api/v1/type/common/target/nninfo/nnid/' + opt_url + '/';
-        return this.api.get(url, "").then((data) => {
-            data = JSON.parse(data);
-           return data;
-        });
-    }
-
-    getCommonNNInfo(params) {
-        return this.api.get('/api/v1/type/common/target/nninfo/nnid/all/', '').then((data) => {
-            data = JSON.parse(data);
-            this.log("getCommonNNInfo", data)
-            return data;
-        });
-    }
-
-    getCommonNNInfoAuto(params) {
-        return this.api.get('/api/v1/type/automl/state/rule/graph_id/'+params+'/', '').then((data) => {
-            data = JSON.parse(data);
-            this.log("getCommonNNInfoAuto", data)
-           return data;
         });
     }
 
@@ -45,14 +24,15 @@ export default class ReportRepository {
         });
     }
 
-    postCommonNNInfo(params, jsonData) {
-        return this.api.post('/api/v1/type/common/target/nninfo/nnid/'+params+'/', jsonData).then((data) => {
+    getCommonNNInfo(params) {
+        return this.api.get('/api/v1/type/common/target/nninfo/nnid/'+params+'/', '').then((data) => {
             data = JSON.parse(data);
-            this.log("postCommonNNInfo", data)
+            this.log("getCommonNNInfo", data)
             return data;
         });
     }
 
+    //Network WF Info
     postCommonNNInfoWF(params, jsonData) {
         return this.api.post('/api/v1/type/common/target/nninfo/nnid/'+params+'/version/', jsonData).then((data) => {
             data = JSON.parse(data);
@@ -61,53 +41,121 @@ export default class ReportRepository {
         });
     }
 
-    putCommonNNInfoWF(nn_id, wf_ver_id, jsonData) {
-        return this.api.put('/api/v1/type/common/target/nninfo/nnid/'+nn_id+'/version/', jsonData).then((data) => {
+    putCommonNNInfoWF(params, jsonData) {
+        return this.api.put('/api/v1/type/common/target/nninfo/nnid/'+params+'/version/', jsonData).then((data) => {
             data = JSON.parse(data);
-            this.log("putCommonNNInfoWF", data)
+            this.log("getCommonNNInfoWF", data)
             return data;
         });
     }
 
-    postCommonNNInfoWFNode(nn_id, wf_ver_id, jsonData) {
-        return this.api.post('/api/v1/type/wf/target/init/mode/simple/'+nn_id+'/wfver/'+wf_ver_id+'/', jsonData).then((data) => {
+    getCommonNNInfoWF(params) {
+        return this.api.get('/api/v1/type/common/target/nninfo/nnid/'+params+'/version/', '').then((data) => {
+            data = JSON.parse(data);
+            this.log("getCommonNNInfoWF", data)
+            return data;
+        });
+    }
+
+    //Network Batch Info
+    // postCommonNNInfoBatch(params, wf_ver_id, jsonData) {
+    //     return this.api.post('/api/v1/type/common/target/nninfo/nnid/'+params+'/version/'+wf_ver_id+'/', jsonData).then((data) => {
+    //         data = JSON.parse(data);
+    //         this.log("postCommonNNInfoBatch", data)
+    //         return data;
+    //     });
+    // }
+
+    putCommonNNInfoBatch(params, wf_ver_id, jsonData) {
+        return this.api.put('/api/v1/type/common/target/nninfo/nnid/'+params+'/version/'+wf_ver_id+'/', jsonData).then((data) => {
+            data = JSON.parse(data);
+            this.log("putCommonNNInfoBatch", data)
+            return data;
+        });
+    }
+
+    getCommonNNInfoBatch(params, wf_ver_id){
+        return this.api.get('/api/v1/type/common/target/nninfo/nnid/'+params+'/version/'+wf_ver_id+'/', "").then((data) => {
+            data = JSON.parse(data);
+            this.log("getCommonBatchInfo", data)
+            return data;
+        });
+    }
+
+    //Network WF Node Info
+    postCommonNNInfoWFNode(params, wf_ver_id, jsonData) {
+        return this.api.post('/api/v1/type/wf/target/init/mode/simple/'+params+'/wfver/'+wf_ver_id+'/', jsonData).then((data) => {
             data = JSON.parse(data);
             this.log("postCommonNNInfoWFNode", data)
             return data;
         });
     }
 
-    getCommonNodeInfo(nn_id, wf_ver_id, desc){
-        return this.api.get('/api/v1/type/wf/target/init/mode/simple/'+nn_id+'/wfver/'+wf_ver_id+'/desc/'+desc+'/', "").then((data) => {
+    putCommonNNInfoWFNode(params, wf_ver_id, jsonData) {
+        return this.api.put('/api/v1/type/wf/target/init/mode/simple/'+params+'/wfver/'+wf_ver_id+'/', jsonData).then((data) => {
+            data = JSON.parse(data);
+            this.log("putCommonNNInfoWFNode", data)
+            return data;
+        });
+    }
+
+    getCommonNNInfoWFNode(params, wf_ver_id, desc){
+        return this.api.get('/api/v1/type/wf/target/init/mode/simple/'+params+'/wfver/'+wf_ver_id+'/desc/'+desc+'/', "").then((data) => {
             data = JSON.parse(data);
             this.log("getCommonNodeInfo", data)
             return data;
         });
     }
 
-    getFileUploadPath(nn_id, wf_ver_id, dir){
-        return this.api.get('/api/v1/type/wf/state/data/detail/upload/file/nnid/'+nn_id+'/ver/'+wf_ver_id+'/dir/'+dir+'/').then((data) => {
-            data = JSON.parse(data);
-            this.log("getFileUploadPath:"+nn_id, data)
-            return data;
-        });
-    }
+    
 
-    putFileUpload(nn_id, wf_ver_id, dir, jsonData){
-        return this.api.put('/api/v1/type/wf/state/data/detail/upload/file/nnid/'+nn_id+'/ver/'+wf_ver_id+'/dir/'+dir+'/', jsonData).then((data) => {
+    //File Upload
+    putFileUpload(params, wf_ver_id, dir, jsonData){
+        return this.api.put('/api/v1/type/wf/state/data/detail/upload/file/nnid/'+params+'/ver/'+wf_ver_id+'/dir/'+dir+'/', jsonData).then((data) => {
             data = JSON.parse(data);
             this.log("putFileUpload", data)
             return data;
         });
     }
 
-    deleteFileUploadPath(nn_id, wf_ver_id, dir, jsonData){
-        return this.api.delete('/api/v1/type/wf/state/data/detail/upload/file/nnid/'+nn_id+'/ver/'+wf_ver_id+'/dir/'+dir+'/', jsonData).then((data) => {
+    getFileUpload(params, wf_ver_id, dir, type){
+        return this.api.get('/api/v1/type/wf/state/data/detail/upload/file/nnid/'+params+'/ver/'+wf_ver_id+'/dir/'+dir+'/type/'+type+'/', '').then((data) => {
+            data = JSON.parse(data);
+            this.log("getFileUploadPath:", data)
+            return data;
+        });
+    }
+
+    deleteFileUpload(params, wf_ver_id, dir, jsonData){
+        return this.api.delete('/api/v1/type/wf/state/data/detail/upload/file/nnid/'+params+'/ver/'+wf_ver_id+'/dir/'+dir+'/', jsonData).then((data) => {
             data = JSON.parse(data);
             this.log("deleteFileUploadPath", data)
             return data;
         });
     }
+
+    //Auto Ml Info
+    getCommonNNInfoAuto(params) {
+        return this.api.get('/api/v1/type/automl/state/rule/graph_id/'+params+'/', '').then((data) => {
+            data = JSON.parse(data);
+            this.log("getCommonNNInfoAuto", data)
+           return data;
+        });
+    }
+
+    //Run Train
+    postTainRun(params, wf_ver_id) {
+        return this.api.post('/api/v1/type/runmanager/state/train/nnid/'+params+'/ver/'+wf_ver_id+'/', '').then((data) => {
+            data = JSON.parse(data);
+            this.log("postTainRun", data)
+            return data;
+        });
+    }
+
+
+
+
+    
 
     putCommonNetConf(nn_id, wf_ver_id, net_type, conf_type, jsonData) {
         return this.api.put('/api/v1/type/wf/state/netconf/detail/'+net_type+'/nnid/'+nn_id+'/ver/'+wf_ver_id+'/node/'+conf_type+'/', jsonData).then((data) => {

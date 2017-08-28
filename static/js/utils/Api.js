@@ -23,15 +23,16 @@ export default class Api {
     }
   
     get (url, params) {
-        console.log(EnvConstants.getApiServerUrl() + url + params);
+        console.log(EnvConstants.getApiServerUrl() + url);
         this.setLoading(true);
         return fetch(
-            EnvConstants.getApiServerUrl() + url + params,
+            EnvConstants.getApiServerUrl() + url ,
             {
                 method: 'GET',
                 mode: "cors",
                 headers: new Headers({
-                     'Accept': 'application/json'
+                     'Accept': 'application/json',
+                     'Content-type':'application/json'
                 })
             }
         ).then(function(response) {

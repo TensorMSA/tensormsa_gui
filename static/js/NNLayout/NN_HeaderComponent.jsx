@@ -25,10 +25,7 @@ export default class NN_HeaderComponent extends React.Component {
             case 1:
             	return this.props.getHeaderEvent(1); //call Net Info
             case 2:
-            	if(this.context.NN_ID && this.context.NN_TYPE != 'cifar'){
-            		return this.props.getHeaderEvent(2);
-            	}
-				break;
+            	return this.props.getHeaderEvent(2);
             case 3:
             	// if(this.context.NN_ID && this.context.NN_TYPE != 'cifar'){
             		return this.props.getHeaderEvent(3);
@@ -112,10 +109,8 @@ export default class NN_HeaderComponent extends React.Component {
 					<ul>
 						<li className={this.isActive(1)}><a href="#" onClick={this.setFilter.bind(this, 1)}>Net Info</a></li>
 						<li className={this.isActive(2)}><a href="#" onClick={this.setFilter.bind(this, 2)}>Net Detail</a></li>
-						<li className={this.isActive(3)}><a href="#" onClick={this.setFilter.bind(this, 3)}>Data Process</a></li>
 						<li className={this.isActive(4)}><a href="#" onClick={this.setFilter.bind(this, 4)}>Net Create</a></li>  
-						<li className={this.isActive(5)}><a href="#" onClick={this.setFilter.bind(this, 5)}>Train Statistics</a></li>
-						<li className={this.isActive(6)}><a href="#" onClick={this.setFilter.bind(this, 6)}>Predict Test</a></li>
+						<li className={this.isActive(5)}><a href="#" onClick={this.setFilter.bind(this, 5)}>Monitering</a></li>
 					</ul>
 				</nav>
 					<dl className="utilMenu">
