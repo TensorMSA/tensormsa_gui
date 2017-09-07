@@ -25,7 +25,17 @@ export default class NN_InfoNewComponent extends React.Component {
             train_node_name:null,
             eval_node_name:null,
             tmp_train_node_name:"tmpTrainNodeName",
-            tmp_eval_node_name:"tmpEvalNodeName"
+            tmp_eval_node_name:"tmpEvalNodeName",
+            NN_TableColArr1:[    {index:0,      id:"title",                 name:"Title"}
+                                ,{index:1,      id:"input_data",            name:"Input Data"}
+                                ,{index:2,      id:"example",               name:"Example"}
+                            ],
+            NN_TableColArr2:[    {index:0,      id:"sel",                   name:"Sel"}
+                                ,{index:1,      id:"network",               name:"Network"}
+                                ,{index:2,      id:"description",           name:"Description"}
+                                ,{index:3,      id:"help",                  name:"Help"}
+
+                            ],
         };
     }
 
@@ -57,149 +67,17 @@ export default class NN_InfoNewComponent extends React.Component {
         });
     }
 
-    // getConfigData에서 Table 값을 가져와 로우 단위로 값을 편성하여 Json을 만들기 쉽게 하기 위함이다.
-    setConfigData(data){
-        let redata = []
-        let childcnt = data.childElementCount // Table Cell Child Count
-        let text = data.textContent.trim() // Table Cell Text innerText
-        let rowspan = data.rowSpan // Table Cell RowSpan
-        let edit = data.contentEditable // Table Cell Editable
-        let type = data.getAttribute("type") // Table Last Cell Type ex) number, string
-        let color = data.style.color
-
-        if(childcnt > 0){// 마지막 값인 경우 childcnt를 가진다.
-            let childN = data.childNodes[0]
-            // Select Box의 선택 값을 가져와 넣어준다.
-            if(childN != undefined && childN.childNodes[0] != undefined && childN.childNodes[0].type == "select-one"){
-                let selectedValue = ""
-                if(childN.childNodes[0].selectedOptions[0] != null){
-                   text = childN.childNodes[0].selectedOptions[0].value
-                }
-                type = "sel"
-                color = childN.childNodes[0].style.color
-            }else{// 일반적인 Text 값을 가져온다.
-                text = data.children[0].value
-                type = data.children[0].type
-            }
-
-            rowspan = 1
-            edit = "true"
+    findColInfo(col, idxType, idxName){
+        let fItem = ""
+        if(idxType == "index"){
+            fItem = col.find(data => { return data.index == idxName})
+        }else if(idxType == "id"){
+            fItem = col.find(data => { return data.id == idxName})
+        }else if(idxType == "name"){
+            fItem = col.find(data => { return data.name == idxName})
         }
 
-        if(type == "number"){
-            type = "int"
-        }else if(type == "string"){
-            type = "str"
-        }
-
-        redata.push(text)
-        redata.push(rowspan)
-        redata.push(edit)
-        redata.push(type)
-        redata.push(color)
-
-        return redata
-    }
-
-    // Table에 있는 값을 가져와 Json으로 만들어주는 함수.
-    getConfigData(){
-        let noconfTable = this.refs.netconfig.refs.master3
-        let tdata = noconfTable.rows
-        let sColor = this.state.color
-
-        let preData = []
-        let params = {}
-        let maxrowcnt = noconfTable.tHead.children[0].childElementCount
-        let arr = []
-        // Table Cell 이 Group 으로 묶여 있어 Rowspan 을 재정의 하여 배열로 만들어 주며 이를 Json으로 만들어준다.
-        for(let rowcnt=0;rowcnt < tdata.length;rowcnt++){
-            let row = tdata[rowcnt].cells
-            
-            // Row 단위로 주요 정보를 배열 형태로 만들어 준다.
-            let rowcol = 0
-            for(let colcnt=0;colcnt < maxrowcnt;colcnt++){
-                if(preData[colcnt] == undefined){//첫번쨰 줄은 바로 Insert 해준다.
-                    preData.push(this.setConfigData(row[colcnt]))
-                }else{
-                    if(preData[colcnt][1] == 1){// RowSpan이 1인경우는 값을 넣어주어야 한다.
-                        preData[colcnt] = this.setConfigData(row[rowcol])
-                        rowcol += 1
-                    }else if(preData[colcnt][1] > 1){// RowSpan이 1을 넘는 경우는 넣어주지 않고 이전 값을 사용하며 RowSpan을 1 줄인다.
-                        preData[colcnt][1] = preData[colcnt][1]-1
-                    }
-                }
-            }
-            
-            // 만들어 진 배열을 컬럼 단위로 읽어 Json으로 변환해준다.
-            let value = ""
-            let param = params
-            let arrflag = "N"
-            for(let k=0;k < preData.length-1;k++){  
-                // let inputflag = preData[k][2]
-                let textdata = preData[k][0]
-                let color = preData[k][4]
-                
-                // Value 값을 가져오기 위함이다.
-                // let vflag = preData[k+1][2]
-                let vdata = preData[k+1][0]
-                let vcolor = preData[k+1][4]
-
-                if(vdata == ""){ // 데이터가 끝까지 없는 경우는 넘어가야 한다. "" 경우
-                    continue
-                }
-
-                if(vcolor == sColor && arrflag == "N"){// 배열이 아닌 마지막 값을 가진 Cell 이 오면 
-                    param["type"] = preData[k+1][3]
-                    
-                    if(param["option"] == undefined){
-                        param["option"] = null
-                    }
-                    if(param["auto"] == undefined){
-                        param["auto"] = false
-                    }
-
-                    if(vdata == this.state.arrayData){
-                        param[textdata] = []
-                    }else if(vdata == this.state.jsonData){
-                        param[textdata] = {}
-                    }else if(vdata == "null"){
-                        param[textdata] = null
-                    }else{
-                        if(param["type"] == "int"){
-                            vdata *= 1
-                        }
-                        param[textdata] = vdata // 일반 데이터 값을 넣어준다.
-                    }
-                    
-                }else if(vcolor != sColor && vdata != "" && isNaN(vdata) == false ){//자식이 컬럼이면서 숫자인 경우는 배열이다. 
-                    if(param[textdata] == undefined || param[textdata] == false || param[textdata] == null){// 값이 없의 면서 Json
-                        param[textdata] = [] 
-                    }  
-
-                    if(preData[k+2] != null && preData[k+2][3] != ""){
-                        param["type"] = preData[k+2][3]
-                        if(param["option"] == undefined){
-                            param["option"] = null
-                        }
-                        if(param["auto"] == undefined){
-                            param["auto"] = false
-                        }
-                    }
-                    if(param["type"] == "int"){
-                        preData[k+2][0] *= 1
-                    }
-
-                    param[textdata][vdata] = preData[k+2][0]
-                    arrflag = "Y"
-                }else if(arrflag == "N"){//배열이 아닌 경우
-                    if(param[textdata] == undefined || param[textdata] == false || param[textdata] == null){// 값이 없의 면서 Json
-                        param[textdata] = {}
-                    }
-                    param = param[textdata]
-                }
-            }
-        }
-        return params
+        return fItem
     }
 
     // Network Create
@@ -207,12 +85,13 @@ export default class NN_InfoNewComponent extends React.Component {
         let flag = "T"
         let title = ""
         let input_data = ""
-        let netInfotable = this.refs.master1.state
+        let table = this.refs.master1
+        let col = this.state.NN_TableColArr1
         
         // Validation Check
-        for (var i in netInfotable.data) {
-            title = netInfotable.data[i]["title"]
-            input_data = netInfotable.data[i]["input_data"]
+        for (let i=1 ; i < table.rows.length ; i++) {
+            title = table.rows[i].cells[this.findColInfo(col, "id", "title").index].innerText
+            input_data = table.rows[i].cells[this.findColInfo(col, "id", "input_data").index].children[0].value
             if(input_data == null || input_data == ""){ alert( title + " is not exist." );return; flag = "F"; break;}
         }
 
@@ -222,14 +101,14 @@ export default class NN_InfoNewComponent extends React.Component {
             return
         }
 
-        let params = this.getConfigData()
+        let params = this.refs.netconfig.getConfigData("auto")
         
         // Make NN Info
-        let inDefault = ["biz_cate","biz_sub_cate","nn_title","nn_desc"]
+        let inDefault = ["", "biz_cate","biz_sub_cate","nn_title","nn_desc"]
         let dparam = {}
-        for (let i in netInfotable.data) {
-            title = netInfotable.data[i]["title"]
-            input_data = netInfotable.data[i]["input_data"]
+        for (let i=1 ; i < table.rows.length ; i++) {
+            title = table.rows[i].cells[this.findColInfo(col, "id", "title").index].innerText
+            input_data = table.rows[i].cells[this.findColInfo(col, "id", "input_data").index].children[0].value
             dparam[inDefault[i]] = input_data
         }
         dparam["use_flag"] = "Y"
@@ -264,33 +143,35 @@ export default class NN_InfoNewComponent extends React.Component {
         // let wf_ver_id = "1"
 
 
-        // Make NN Info
-        this.props.reportRepository.postCommonNNInfo("", dparam).then((nn_id) => {
-            this.setState({ nn_id: nn_id })
-            // Make NN WF Info
-            this.props.reportRepository.postCommonNNInfoWF(nn_id, wfparam).then((wf_ver_id) => {
-                this.setState({ wf_ver_id: wf_ver_id })
-                // Make NN WF Node Info
-                this.props.reportRepository.postCommonNNInfoWFNode(nn_id, wf_ver_id, nodeparam).then((tableData) => {
-                    // Train File Save
-                    desc = "train_data"
-                    this.props.reportRepository.getCommonNodeInfo(nn_id, wf_ver_id, desc).then((tableData) => {
-                        desc = tableData[0]["fields"]["nn_wf_node_name"]
-                        this.props.reportRepository.putFileUpload(nn_id, wf_ver_id, desc, tfparam).then((tableData) => {
+        let re = confirm( "Are you create?" )
+        if(re == true){
+            // Make NN Info
+            this.props.reportRepository.postCommonNNInfo("", dparam).then((nn_id) => {
+                this.setState({ nn_id: nn_id })
+                // Make NN WF Info
+                this.props.reportRepository.postCommonNNInfoWF(nn_id, wfparam).then((wf_ver_id) => {
+                    this.setState({ wf_ver_id: wf_ver_id })
+                    // Make NN WF Node Info
+                    this.props.reportRepository.postCommonNNInfoWFNode(nn_id, wf_ver_id, nodeparam).then((tableData) => {
+                        // Train File Save
+                        desc = "train_data"
+                        this.props.reportRepository.getCommonNNInfoWFNode(nn_id, wf_ver_id, desc).then((tableData) => {
+                            desc = tableData[0]["fields"]["nn_wf_node_name"]
+                            this.props.reportRepository.putFileUpload(nn_id, wf_ver_id, desc, tfparam).then((tableData) => {
+                            });
                         });
-                    });
 
-                    // Eval File Save
-                    desc = "eval_data"
-                    this.props.reportRepository.getCommonNodeInfo(nn_id, wf_ver_id, desc).then((tableData) => {
-                        desc = tableData[0]["fields"]["nn_wf_node_name"]
-                        this.props.reportRepository.putFileUpload(nn_id, wf_ver_id, desc, efparam).then((tableData) => {
+                        // Eval File Save
+                        desc = "eval_data"
+                        this.props.reportRepository.getCommonNNInfoWFNode(nn_id, wf_ver_id, desc).then((tableData) => {
+                            desc = tableData[0]["fields"]["nn_wf_node_name"]
+                            this.props.reportRepository.putFileUpload(nn_id, wf_ver_id, desc, efparam).then((tableData) => {
+                            });
                         });
                     });
                 });
             });
-        });
-                
+        } 
     }
 
     //Network List가 선택 되면 해당 Config를 조회해준다.
@@ -298,7 +179,7 @@ export default class NN_InfoNewComponent extends React.Component {
         let netSelectTable = this.refs.master2
         let value = selectedValue.target.value //radio button cell
         if(value == undefined && selectedValue.target.attributes[0] != undefined){// key, desc cell
-            value = selectedValue.target.attributes[0].value
+            value = selectedValue.target.attributes [0].value
             for(let i=1 ; i < netSelectTable.rows.length ; i++){
                 let key = netSelectTable.rows[i].children[0].children.rd1
                 if(key.value == value){
@@ -339,17 +220,15 @@ export default class NN_InfoNewComponent extends React.Component {
         // Network default
         let nnInfoDefault = [];
         if (this.state.NN_TableMaster == null){
-            this.state.NN_TableMaster = [   {title:"Category"          , input_data:"", ex:"ex) ERP, MES, SCM"}
-                                            ,{title:"SubCategory"      , input_data:"", ex:"ex) MRO"}
-                                            ,{title:"Title"         , input_data:"", ex:"ex) MRO Classification"}
-                                            ,{title:"Description"   , input_data:"", ex:"ex) MRO Classification Description"}
+            this.state.NN_TableMaster = [   {title:"Category"       , width:10    , input_data:"", ex:"ex) ERP, MES, SCM"}
+                                            ,{title:"SubCategory"    , width:10    , input_data:"", ex:"ex) MRO"}
+                                            ,{title:"Title"          , width:100    , input_data:"", ex:"ex) MRO Classification"}
+                                            ,{title:"Description"    , width:5000    , input_data:"", ex:"ex) MRO Classification Description"}
                                          ];
         }
         nnInfoDefault = this.state.NN_TableMaster
 
-        /////////////////////////////////////////////////////////////////////////////////////////
-        // Select Network List
-        /////////////////////////////////////////////////////////////////////////////////////////
+        
         function sortByKey(array, key) {
             return array.sort(function(a, b) {
                 var x = a[key]; var y = b[key];
@@ -357,6 +236,36 @@ export default class NN_InfoNewComponent extends React.Component {
             });
         }
 
+        function makeHeader(data){// Make header
+            let headerData = []
+            for(let i in data){
+                headerData.push(<th key={k++} style={{"textAlign":"center"}} >{data[i].name}</th>)
+            }
+            let tableHeader = []; //make header
+            tableHeader.push(<tr key={k++} >{headerData}</tr>)
+            return tableHeader
+        }
+
+        let tableHeader = makeHeader(this.state.NN_TableColArr1)
+        let tableData = []
+        for(let rows in this.state.NN_TableMaster){
+            let colData = [];
+            let row = this.state.NN_TableMaster[rows]
+            colData.push(<td key={k++} style={{ "width":"20%"}}> {row["title"]} </td>)
+            colData.push(<td key={k++} > < input type = {"string"} style={{"textAlign":"center", "width":"100%"}} 
+                                                        defaultValue = {row["input_data"]}
+                                                        maxLength = {row["width"]}  />  </td>)
+            colData.push(<td key={k++} style={{"textAlign":"left", "width":"30%"}} > {row["ex"]} </td>)
+
+            tableData.push(<tr key={k++}>{colData}</tr>)
+        }
+
+        let masterListTable = []
+        masterListTable.push(<thead ref='thead' key={k++} className="center">{tableHeader}</thead>)
+        masterListTable.push(<tbody ref='tbody' key={k++} className="center" >{tableData}</tbody>)
+        /////////////////////////////////////////////////////////////////////////////////////////
+        // Select Network List
+        /////////////////////////////////////////////////////////////////////////////////////////
         // Network List
         let nnInfoNewList = [];
         if (this.state.NN_TableData != null) {
@@ -368,7 +277,7 @@ export default class NN_InfoNewComponent extends React.Component {
 
         // Network Select Header
         let tableHeaderSL = []; //make header
-        let colDatasSL = ["Sel", "Network", "Description", "Image"]
+        let colDatasSL = ["Sel", "Network", "Description", "Help"]
         let headerDataSL = []
         for (let i=0;i < colDatasSL.length;i++){
             headerDataSL.push(<th key={k++} style={{"textAlign":"center"}} >{colDatasSL[i]}</th>)
@@ -422,50 +331,13 @@ export default class NN_InfoNewComponent extends React.Component {
                         <h1> Network Info </h1>
                     </div>
 
-                    <div className="net-info-default">
-                        <table className="form-table align-left">
-                            <BootstrapTable ref= 'master1' 
-                                data={nnInfoDefault} 
-                                striped={true} 
-                                hover={true} 
-                                condensed={true} 
-                                cellEdit={ cellEditProp } 
-                                >
-                                
-                                <TableHeaderColumn dataField="title" headerAlign='center' dataAlign='center' isKey={true} >Title</TableHeaderColumn>
-                                <TableHeaderColumn dataField="input_data"  headerAlign='center' dataAlign='center' >Input Data</TableHeaderColumn>
-                                <TableHeaderColumn dataField="ex"  headerAlign='center' dataAlign='left' editable={ false } >Example</TableHeaderColumn>
-                            </BootstrapTable>
+
+                    <div ref="masterInfo">
+                        <table className="table detail" ref= 'master1' >
+                            {masterListTable}
                         </table>
                     </div>
-
-                    <table className="table detail">
-                    <tr>
-                    <td style={{"verticalAlign":"top"}}>
-                    <h1> Network Train Source File Upload </h1>
-                    <FileUploadComponent ref="trainfilesrc" 
-                                            nn_id={this.state.tmp_train_node_name} 
-                                            nn_wf_ver_id={"1"} 
-                                            nn_node_name={this.state.train_node_name} 
-                                            nn_path_type={"source"}
-                                            uploadbtnflag={true} 
-                                            deletebtnflag={true} />
-                    </td>
-
-                    <td style={{"verticalAlign":"top"}}>
-                    <h1> Network Eval Source File Upload </h1>
-                    <FileUploadComponent ref="evalfilesrc" 
-                                            nn_id={this.state.tmp_eval_node_name} 
-                                            nn_wf_ver_id={"1"} 
-                                            nn_node_name={this.state.eval_node_name} 
-                                            nn_path_type={"source"}
-                                            uploadbtnflag={true} 
-                                            deletebtnflag={true} />
-                    </td>
-
-                    </tr>
-                    </table>
-                    
+                        
 
                     <div>
                         <h1> Network Select </h1>
@@ -496,6 +368,32 @@ export default class NN_InfoNewComponent extends React.Component {
 
                     <JsonConfComponent ref="netconfig" NN_TableDataDetail={this.state.NN_TableDataDetail} />
 
+                    <table className="table detail">
+                    <tr>
+                    <td style={{"verticalAlign":"top"}}>
+                    <h1> Network Train Source File Upload </h1>
+                    <FileUploadComponent ref="trainfilesrc" 
+                                            nn_id={this.state.tmp_train_node_name} 
+                                            nn_wf_ver_id={"1"} 
+                                            nn_node_name={this.state.train_node_name} 
+                                            nn_path_type={"source"}
+                                            uploadbtnflag={true} 
+                                            deletebtnflag={true} />
+                    </td>
+
+                    <td style={{"verticalAlign":"top"}}>
+                    <h1> Network Eval Source File Upload </h1>
+                    <FileUploadComponent ref="evalfilesrc" 
+                                            nn_id={this.state.tmp_eval_node_name} 
+                                            nn_wf_ver_id={"1"} 
+                                            nn_node_name={this.state.eval_node_name} 
+                                            nn_path_type={"source"}
+                                            uploadbtnflag={true} 
+                                            deletebtnflag={true} />
+                    </td>
+
+                    </tr>
+                    </table>
 
                 </div>
             </section>

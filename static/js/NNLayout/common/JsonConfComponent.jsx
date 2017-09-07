@@ -14,13 +14,165 @@ export default class JsonConfComponent extends React.Component {
             nn_wf_ver_id:null,
             color : "red",
             arrayData : "[ ]",
-            jsonData : "{ }"
+            jsonData : "{ }"    
         };
-
+        this.getConfigData = this.getConfigData.bind(this);
     }
     
     componentDidMount() {
     
+    }
+
+    // getConfigData에서 Table 값을 가져와 로우 단위로 값을 편성하여 Json을 만들기 쉽게 하기 위함이다.
+    setConfigData(data){
+        let redata = []
+        let childcnt = data.childElementCount // Table Cell Child Count
+        let text = data.textContent.trim() // Table Cell Text innerText
+        let rowspan = data.rowSpan // Table Cell RowSpan
+        let edit = data.contentEditable // Table Cell Editable
+        let type = data.getAttribute("type") // Table Last Cell Type ex) number, string
+        let color = data.style.color
+
+        if(childcnt > 0){// 마지막 값인 경우 childcnt를 가진다.
+            let childN = data.children[0]
+            // Select Box의 선택 값을 가져와 넣어준다.
+            if(childN != undefined && childN.childNodes[0] != undefined && childN.childNodes[0].type == "select-one"){
+                let selectedValue = ""
+                if(childN.childNodes[0].selectedOptions[0] != null){
+                   text = childN.childNodes[0].selectedOptions[0].value
+                }
+                type = "sel"
+                color = childN.childNodes[0].style.color
+            }else{// 일반적인 Text 값을 가져온다.
+                text = data.children[0].value
+                type = data.children[0].type
+            }
+
+            rowspan = 1
+            edit = "true"
+        }
+
+        if(type == "number"){
+            type = "int"
+        }else if(type == "string"){
+            type = "str"
+        }
+
+        redata.push(text)
+        redata.push(rowspan)
+        redata.push(edit)
+        redata.push(type)
+        redata.push(color)
+
+        return redata
+    }
+
+    // Table에 있는 값을 가져와 Json으로 만들어주는 함수.
+    getConfigData(makeType){
+        let noconfTable = this.refs.master3
+        let tdata = noconfTable.rows
+        let sColor = this.state.color
+
+        let preData = []
+        let params = {}
+        let maxrowcnt = noconfTable.tHead.children[0].childElementCount
+        let arr = []
+        // Table Cell 이 Group 으로 묶여 있어 Rowspan 을 재정의 하여 배열로 만들어 주며 이를 Json으로 만들어준다.
+        for(let rowcnt=1;rowcnt < tdata.length;rowcnt++){
+            let row = tdata[rowcnt].cells
+            
+            // Row 단위로 주요 정보를 배열 형태로 만들어 준다.
+            let rowcol = 0
+            for(let colcnt=0;colcnt < maxrowcnt;colcnt++){
+                if(preData[colcnt] == undefined){//첫번쨰 줄은 바로 Insert 해준다.
+                    preData.push(this.setConfigData(row[colcnt]))
+                }else{
+                    if(preData[colcnt][1] == 1){// RowSpan이 1인경우는 값을 넣어주어야 한다.
+                        preData[colcnt] = this.setConfigData(row[rowcol])
+                        rowcol += 1
+                    }else if(preData[colcnt][1] > 1){// RowSpan이 1을 넘는 경우는 넣어주지 않고 이전 값을 사용하며 RowSpan을 1 줄인다.
+                        preData[colcnt][1] = preData[colcnt][1]-1
+                    }
+                }
+            }
+            
+            // 만들어 진 배열을 컬럼 단위로 읽어 Json으로 변환해준다.
+            let value = ""
+            let param = params
+            let arrflag = "N"
+            for(let k=0;k < preData.length-1;k++){  
+                // let inputflag = preData[k][2]
+                let textdata = preData[k][0]
+                let color = preData[k][4]
+                
+                // Value 값을 가져오기 위함이다.
+                // let vflag = preData[k+1][2]
+                let vdata = preData[k+1][0]
+                let vcolor = preData[k+1][4]
+
+                if(vdata == ""){ // 데이터가 끝까지 없는 경우는 넘어가야 한다. "" 경우
+                    continue
+                }
+
+                let inputType = ""
+                if(vcolor == sColor && arrflag == "N"){// 배열이 아닌 마지막 값을 가진 Cell 이 오면 
+                    inputType = preData[k+1][3]  
+                    if(makeType != null && makeType == "auto"){
+                        param["type"] = inputType
+                        if(param["option"] == undefined){
+                            param["option"] = null
+                        }
+                        if(param["auto"] == undefined){
+                            param["auto"] = false
+                        }
+                    }
+                    
+                    if(vdata == this.state.arrayData){
+                        param[textdata] = []
+                    }else if(vdata == this.state.jsonData){
+                        param[textdata] = {}
+                    }else if(vdata == "null"){
+                        param[textdata] = null
+                    }else{
+                        if(inputType == "int"){
+                            vdata *= 1
+                        }
+                        param[textdata] = vdata // 일반 데이터 값을 넣어준다.
+                    }
+                    
+                }else if(vcolor != sColor && vdata != "" && isNaN(vdata) == false ){//자식이 컬럼이면서 숫자인 경우는 배열이다. 
+                    if(param[textdata] == undefined || param[textdata] == false || param[textdata] == null){// 값이 없의 면서 Json
+                        param[textdata] = [] 
+                    }  
+
+                    if(preData[k+2] != null && preData[k+2][3] != ""){
+                        inputType = preData[k+2][3]
+                        if(makeType != null && makeType == "auto"){
+                            param["type"] = inputType
+                            if(param["option"] == undefined){
+                                param["option"] = null
+                            }
+                            if(param["auto"] == undefined){
+                                param["auto"] = false
+                            }
+                        }
+
+                        if(inputType == "int"){
+                            preData[k+2][0] *= 1
+                        }
+                    }
+                    
+                    param[textdata][vdata] = preData[k+2][0]
+                    arrflag = "Y"
+                }else if(arrflag == "N"){//배열이 아닌 경우
+                    if(param[textdata] == undefined || param[textdata] == false || param[textdata] == null){// 값이 없의 면서 Json
+                        param[textdata] = {}
+                    }
+                    param = param[textdata]
+                }
+            }
+        }
+        return params
     }
 
     render() {

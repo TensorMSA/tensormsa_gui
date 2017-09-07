@@ -3,14 +3,8 @@ import NN_HeaderComponent from './NNLayout/NN_HeaderComponent'
 import NN_SectionComponent from './NNLayout/NN_SectionComponent'
 import NN_FooterComponent from './NNLayout/NN_FooterComponent'
 import NN_InfoListComponent from './NNConfiguration/NN_InfoListComponent'
-import NN_BasicInfoComponent from './NNConfiguration/NN_BasicInfoComponent'
-import NN_DataConfigurationComponent from './NNConfiguration/NN_DataConfigurationComponent'
-import NN_NetworkConfigurationComponent from './NNConfiguration/NN_NetworkConfigurationComponent'
-import NN_TrainStaticComponent from './NNConfiguration/NN_TrainStaticComponent'
-import NN_PredictResultComponent from './NNConfiguration/NN_PredictResultComponent'
 import NN_ModalComponent from './NNLayout/NN_ModalComponent';
 import MainSectionComponent from './NNLayout/MainSectionComponent';
-import NN_PreProcessingComponent from './NNConfiguration/NN_PreProcessingComponent'
 import ReportRepository from './repositories/ReportRepository';
 import Api from './utils/Api';
 import NN_InfoNewComponent from './NNConfiguration/NN_InfoNewComponent'
@@ -32,7 +26,6 @@ export default class HomeComponent extends React.Component {
                         netBaseInfo : null,
                         footerArea : <NN_FooterComponent netBaseInfo='Copyrights ⓒ POSCO ICT. All rights reserved.'/>
                          };
-            this.addNewNNInfo = this.addNewNNInfo.bind(this); 
             this.getHeaderEvent = this.getHeaderEvent.bind(this);
             this.setActiveItem = this.setActiveItem.bind(this);
         }
@@ -121,15 +114,7 @@ export default class HomeComponent extends React.Component {
        this.setState({NN_InfoList: <NN_InfoListComponent setActiveItem={this.setActiveItem} addNewNNInfo={this.addNewNNInfo} getHeaderEvent={this.getHeaderEvent} />});
     }
     
-    addNewNNInfo(){
-        this.setState({NN_InfoList: <NN_BasicInfoComponent getHeaderEvent={this.getHeaderEvent}/> });    
-    }
 
-    getPreProcessing(){
-        // if(this.state.NN_ID){
-            this.setState({NN_InfoList: <NN_PreProcessingComponent getHeaderEvent={this.getHeaderEvent} nn_id={this.state.NN_ID}/> });  
-        // } 
-    }
 
     getNetDetailInfo(){
         // if(this.state.NN_ID){

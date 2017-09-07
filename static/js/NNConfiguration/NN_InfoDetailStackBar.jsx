@@ -48,9 +48,10 @@ export default class NN_InfoDetailStackBar extends React.Component {
       let nndata= []
       let labels = ""
       let predicts = ""
-
-      labels = batchData["labels"]
-      predicts = batchData["predicts"]
+      if(batchData != null){
+        labels = batchData["labels"]
+        predicts = batchData["predicts"]
+      }
       
       for(let j=0 ; j < labels.length ; j++){
         let ttt = 0
@@ -69,6 +70,9 @@ export default class NN_InfoDetailStackBar extends React.Component {
       this.state.NN_Data = nndata 
       // this.setState({ NN_Data: nndata })
       // 최초 Pie 차트를 보여준다.
+      if(batchData == null){
+        labels = ["blank"]
+      }
       this.stackBarChartOnClick(labels[0])
     }
 
@@ -86,6 +90,10 @@ export default class NN_InfoDetailStackBar extends React.Component {
 
         let labels = this.state.NN_Labels
         let batchData = this.state.NN_Data
+
+        if(batchData == null){
+          return null
+        }
         
         let label = []
         let data = []
@@ -158,9 +166,11 @@ export default class NN_InfoDetailStackBar extends React.Component {
 
         let batchData = this.props.NN_Data
 
-        if(batchData != null && batchData != this.state.NN_DataPre){
+        if(batchData != this.state.NN_DataPre){
           this.setBatchBarChartData(batchData)
         }
+
+
         this.state.NN_DataPre = batchData
         
         const CustomTooltip1  = React.createClass({// Batch Bar Chart Tooltip
@@ -175,13 +185,22 @@ export default class NN_InfoDetailStackBar extends React.Component {
                   const { payload, label } = this.props;
                   let avg = 0
                   let tot = 0
+                  let payloadValue0 = 0
+                  let payloadValue1 = 0
+                  let payloadName0 = 0
+                  let payloadName1 = 0
                   if(payload != null){
-                    tot = payload[0]["value"]+payload[1]["value"]
+                    payloadValue0 = payload[0]["value"]
+                    payloadValue1 = payload[1]["value"]
+                    payloadName0 = payload[0]["name"]
+                    payloadName1 = payload[1]["name"]
+                    tot = payloadValue0 + payloadValue1
                   }
 
                   if(tot != 0){
-                    avg = Math.round(payload[0]["value"] / tot *100)+"%"
+                    avg = Math.round(payloadValue0 / tot *100)+"%"
                   }
+
                   return (
                     <div className="custom-tooltip">
                       <table style={{"backgroundColor":"white", "fontWeight":"bold"}}>
@@ -190,11 +209,11 @@ export default class NN_InfoDetailStackBar extends React.Component {
                           </td></tr>
                           <tr><td>
                             <p className="intro" style={{"color":"black"}}>
-                                {" "+this.getIntroOfPage(payload[0]["name"]+" : "+payload[0]["value"])+" "}</p>
+                                {" "+this.getIntroOfPage(payloadName0+" : "+payloadValue0)+" "}</p>
                           </td></tr>
                           <tr><td>
                             <p className="intro" style={{"color":"black"}}>
-                                {" "+this.getIntroOfPage(payload[1]["name"]+": "+payload[1]["value"])+" "}</p>
+                                {" "+this.getIntroOfPage(payloadName1+" : "+payloadValue1)+" "}</p>
                           </td></tr>
                           <tr><td>
                             <p className="intro" style={{"color":"black"}}>

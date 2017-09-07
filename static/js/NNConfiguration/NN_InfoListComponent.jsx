@@ -224,12 +224,16 @@ export default class NN_InfoListComponent extends React.Component {
                                                                     onClick = {this.handleClickCheckBox.bind(this)}
                                                                     style={{"textAlign":"center", "width":"100%"}} />  </td>)
             colData.push(<td key={k++} > < input type = {"string"} style={{"textAlign":"center", "width":"100%"}} defaultValue = {row["biz_cate"]}
+                                                        maxLength = "10"
                                                          alt = {row["nn_id"]} onChange = {this.handleChange.bind(this)} />  </td>)
             colData.push(<td key={k++} > < input type = {"string"} style={{"textAlign":"center", "width":"100%"}} defaultValue = {row["biz_sub_cate"]} 
+                                                        maxLength = "10"
                                                          alt = {row["nn_id"]} onChange = {this.handleChange.bind(this)} />  </td>)
             colData.push(<td key={k++} > < input type = {"string"} style={{"textAlign":"center", "width":"100%"}} defaultValue = {row["nn_title"]} 
+                                                         maxLength = "100"
                                                          alt = {row["nn_id"]} onChange = {this.handleChange.bind(this)} />  </td>)
             colData.push(<td key={k++} > < input type = {"string"} style={{"textAlign":"center", "width":"100%"}} defaultValue = {row["nn_desc"]} 
+                                                         maxLength = "5000"
                                                          alt = {row["nn_id"]} onChange = {this.handleChange.bind(this)} />  </td>)
             colData.push(<td key={k++} alt = {row["nn_id"]} > {row["dir"]} </td>) 
             colData.push(<td key={k++} alt = {row["nn_id"]} style ={{"color":"blue", "cursor":"pointer", "fontWeight":"bold"}}

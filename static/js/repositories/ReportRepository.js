@@ -102,7 +102,7 @@ export default class ReportRepository {
     getCommonNNInfoWFNode(params, wf_ver_id, desc){
         return this.api.get('/api/v1/type/wf/target/init/mode/simple/'+params+'/wfver/'+wf_ver_id+'/desc/'+desc+'/', "").then((data) => {
             data = JSON.parse(data);
-            this.log("getCommonNodeInfo", data)
+            this.log("getCommonNNInfoWFNode", data)
             return data;
         });
     }

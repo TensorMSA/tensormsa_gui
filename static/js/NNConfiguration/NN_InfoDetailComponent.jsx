@@ -22,12 +22,13 @@ export default class NN_InfoDetailComponent extends React.Component {
                                 ,{index:3,      id:"train_batch_ver_id",name:"Train Batch"}
                                 ,{index:4,      id:"train_acc_info",    name:"Train Batch Acc"}
                                 ,{index:5,      id:"train_loss_info",   name:"Train Batch Loss"}
-                                ,{index:5,      id:"train_model_exists",name:"Train Model"}
-                                ,{index:6,      id:"pred_batch_ver_id", name:"Predict Batch"}
-                                ,{index:7,      id:"pred_acc_info",     name:"Predict Batch Acc"}
-                                ,{index:8,      id:"pred_loss_info",    name:"Predict Batch Loss"}
-                                ,{index:5,      id:"pred_model_exists", name:"Predict Model"}
-                                ,{index:5,      id:"train", name:"Train"}
+                                ,{index:6,      id:"train_model_exists",name:"Train Model"}
+                                ,{index:7,      id:"pred_batch_ver_id", name:"Predict Batch"}
+                                ,{index:8,      id:"pred_acc_info",     name:"Predict Batch Acc"}
+                                ,{index:9,      id:"pred_loss_info",    name:"Predict Batch Loss"}
+                                ,{index:10,     id:"pred_model_exists", name:"Predict Model"}
+                                ,{index:11,     id:"nn_wf_ver_desc"   , name:"Memo"}
+                                ,{index:12,     id:"train", name:"Train"}
                             ],
             NN_TableBTData: null,
             NN_TableColArr2:[    {index:0,      id:"nn_batch_ver_id",   name:"Batch Version"}
@@ -35,11 +36,15 @@ export default class NN_InfoDetailComponent extends React.Component {
                                 ,{index:2,      id:"active_flag",       name:"Predict Active"}
                                 ,{index:3,      id:"acc_info",          name:"Batch Acc"}
                                 ,{index:4,      id:"loss_info",         name:"Batch Loss"}
-                                ,{index:5,      id:"model",             name:"Network Model"}
+                                ,{index:5,      id:"true_cnt",          name:"True Count"}
+                                ,{index:6,      id:"true_false_cnt",    name:"Total Count"}
+                                ,{index:7,      id:"true_false_percent",name:"Total Percent"}
+                                ,{index:8,      id:"model",             name:"Network Model"}
                             ],
             NN_TableColArr3:[],
             nn_id:null,
             nn_wf_ver_id:null,
+            nn_batch_id:null,
             train_node_name:null,
             eval_node_name:null,
             nn_title:null,
@@ -146,6 +151,8 @@ export default class NN_InfoDetailComponent extends React.Component {
             }
             
             //Batch Active, Eval Flag Save
+            let nn_id = this.state.nn_id
+            let nn_wf_ver_id = this.state.nn_wf_ver_id
             vbody = this.refs.master3.children[1].children
             for(let i=0 ; i < vbody.length; i++){
                 let col = vbody[i].children
@@ -160,10 +167,12 @@ export default class NN_InfoDetailComponent extends React.Component {
                 // Version Active 변경.
 
                 this.props.reportRepository.putCommonNNInfoBatch(this.state.nn_id, this.state.nn_wf_ver_id, wfparam).then((tableData) => {
-                    this.getCommonBatchInfo(this.state.nn_id, this.state.nn_wf_ver_id)
                 });
 
             }
+
+            //Config Save
+            let params = this.refs.netconfig.getConfigData()
         }
     }
     /////////////////////////////////////////////////////////////////////////////////////////
@@ -194,8 +203,32 @@ export default class NN_InfoDetailComponent extends React.Component {
     }
 
     getCommonBatchInfo(ver) {
+        function pad(n, width) {
+          n = n + '';
+          return n.length >= width ? n : new Array(width - n.length + 1).join('0') + n;
+        }
+
         this.props.reportRepository.getCommonNNInfoBatch(this.state.nn_id, ver).then((tableData) => {// Network Batch Info
             this.state.nn_titlebt = "Network Batch List"+" (Ver ID : "+ver+")"
+            //Batch Sort ID를 만들어주어야 한다.nn000000001_1_1
+            for(let i in tableData){
+                if(tableData[i]["nn_batch_ver_id"] != null){
+                    let split1 = ""
+                    let split2 = ""
+                    let splitData = tableData[i]["nn_batch_ver_id"].split("_")
+                    let split0 = splitData[0]
+                    if(splitData[1] != null && isNaN(splitData[1]) == false){
+                        split1 = pad(splitData[1], 10)
+                        split0 += "_"+split1
+                    }
+                    if(splitData[2] != null && isNaN(splitData[2]) == false){
+                        split2 = pad(splitData[2], 10)
+                        split0 += "_"+split2
+                    }
+                    tableData[i]["nn_batch_ver_id_sort"] = split0
+                }
+                
+            }
             this.setState({ NN_TableBTData: tableData })
         });
     }
@@ -223,6 +256,14 @@ export default class NN_InfoDetailComponent extends React.Component {
         this.getCommonBatchInfo(value)// Batch를 조회해준다.
         this.getCommonNodeInfo(value)// Node 정보를 가져와 뿌려준다.Active version의 Node를 가져온다.
         this.setBatchBarChartData(value)//chart정보를 만들어 뿌려준다.
+
+        //클릭된 Batch 번호를 가져와 Title표시를 해주주어야 한다.
+        for(let i in this.state.NN_TableWFData){
+            if(value == this.state.NN_TableWFData[i]["nn_wf_ver_id"]){
+                this.state.nn_batch_id = this.state.NN_TableWFData[i]["train_batch_ver_id"]
+            }
+            
+        }
     }
 
     clickSeletVersion(selectedValue){//Version을 선택하면 새로 조회 한다.   
@@ -476,6 +517,11 @@ export default class NN_InfoDetailComponent extends React.Component {
                                         onClick = {this.clickSeletVersion.bind(this)} > {row["train_model_exists"]} </td>)
             colData.push(<td key={k++} width="50" > < input type = "button" name="btn1"
                                                                     alt = {row["nn_wf_ver_id"]} 
+                                                                    value = {"Memo"}
+                                                                    
+                                                                    style={{"textAlign":"center", "width":"100%"}} /></td>)
+            colData.push(<td key={k++} width="50" > < input type = "button" name="btn2"
+                                                                    alt = {row["nn_wf_ver_id"]} 
                                                                     value = {"Train"}
                                                                     onClick = {this.clickTrainVersion.bind(this)}
                                                                     style={{"textAlign":"center", "width":"100%"}} /></td>)
@@ -488,7 +534,7 @@ export default class NN_InfoDetailComponent extends React.Component {
         /////////////////////////////////////////////////////////////////////////////////////////
         // Batch Table Data Make
         /////////////////////////////////////////////////////////////////////////////////////////
-        this.state.NN_TableBTData = sortData(this.state.NN_TableBTData, "nn_batch_ver_id")
+        this.state.NN_TableBTData = sortData(this.state.NN_TableBTData, "nn_batch_ver_id_sort")
         tableHeader = makeHeader(this.state.NN_TableColArr2)
 
         tableData = []
@@ -547,6 +593,12 @@ export default class NN_InfoDetailComponent extends React.Component {
             colData.push(<td key={k++} alt={row["nn_batch_ver_id"]} > {acc} </td>)
 
             colData.push(<td key={k++} alt={row["nn_batch_ver_id"]} > {loss} </td>)
+
+            colData.push(<td key={k++} alt={row["nn_batch_ver_id"]} > {row["true_cnt"]} </td>)
+
+            colData.push(<td key={k++} alt={row["nn_batch_ver_id"]} > {row["true_false_cnt"]} </td>)
+
+            colData.push(<td key={k++} alt={row["nn_batch_ver_id"]} > {row["true_false_percent"]} % </td>)
 
             if(row["eval_flag"] == "Y" || row["active_flag"] == "Y"){
                 this.state.color = "red"
@@ -627,67 +679,10 @@ export default class NN_InfoDetailComponent extends React.Component {
                     </table>
                 </div>
            
-                <div>
-                    <table className="table detail" ref="linechart">
-                        <tr>
-                        <td>
-                            <h2>Version Train Acc</h2>
-                            <ResponsiveContainer width='100%' height={200}>
-                                <LineChart  data={this.state.acclossLineChartBTData} >
-                                <XAxis dataKey="name"/>
-                                <YAxis/>
-                                <CartesianGrid strokeDasharray="3 3"/>
-                                <Tooltip/>
-                                <Legend />
-                                <Line type="monotone" dataKey="TrainAcc" stroke = {this.state.trueColor} activeDot={{r: 2}}/>
-                                </LineChart>
-                            </ResponsiveContainer>
-                        </td>
-                        <td>
-                            <h2>Version Train Loss</h2>
-                            <ResponsiveContainer width='100%' height={200}>
-                                <LineChart  data={this.state.acclossLineChartBTData} >
-                                <XAxis dataKey="name"/>
-                                <YAxis/>
-                                <CartesianGrid strokeDasharray="3 3"/>
-                                <Tooltip/>
-                                <Legend />
-                                <Line type="monotone" dataKey="TrainLoss" stroke = {this.state.falseColor} activeDot={{r: 2}}/>
-                                </LineChart>
-                            </ResponsiveContainer>
-                        </td>
-                        <td>
-                            <h2>Version Predict Acc</h2>
-                            <ResponsiveContainer width='100%' height={200}>
-                                <LineChart  data={this.state.acclossLineChartBTData} >
-                                <XAxis dataKey="name"/>
-                                <YAxis/>
-                                <CartesianGrid strokeDasharray="3 3"/>
-                                <Tooltip/>
-                                <Legend />
-                                <Line type="monotone" dataKey="PredictAcc" stroke = {this.state.trueColor} activeDot={{r: 2}}/>>
-                                </LineChart>
-                            </ResponsiveContainer>
-                        </td>
-                        <td>
-                            <h2>Version Predict Loss</h2>
-                            <ResponsiveContainer width='100%' height={200}>
-                                <LineChart  data={this.state.acclossLineChartBTData} >
-                                <XAxis dataKey="name"/>
-                                <YAxis/>
-                                <CartesianGrid strokeDasharray="3 3"/>
-                                <Tooltip/>
-                                <Legend />
-                                <Line type="monotone" dataKey="PredictLoss" stroke = {this.state.falseColor} activeDot={{r: 2}}/>
-                                </LineChart>
-                            </ResponsiveContainer>
-                        </td>
-                        </tr>
-                    </table>
-                </div>
+
 
                  <div>
-                    <h1> Classification chart </h1>
+                    <h1> Train Model Accuracy chart ({this.state.nn_batch_id})</h1>
                     <NN_InfoDetailStackBar ref="stackbar" NN_Data={this.state.tBarChartBTData} />
                 </div>
 
@@ -776,6 +771,8 @@ export default class NN_InfoDetailComponent extends React.Component {
                     <h1> Network Config ({this.state.nodeType}) </h1>
                     <JsonConfComponent ref="netconfig" NN_TableDataDetail={this.state.NN_TableNodeDataSort} />
                 </div>
+
+
             </div>
             </section>
         )
