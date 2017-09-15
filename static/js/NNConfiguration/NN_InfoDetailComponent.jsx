@@ -4,8 +4,10 @@ import Api from './../utils/Api'
 import FileUploadComponent from './../NNLayout/common/FileUploadComponent'
 import JsonConfComponent from './../NNLayout/common/JsonConfComponent'
 import NN_InfoDetailStackBar from './../NNConfiguration/NN_InfoDetailStackBar'
+import NN_InfoDetailMemoModal from './../NNConfiguration/NN_InfoDetailMemoModal';
 import { Line, LineChart, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import {Pie} from 'react-chartjs-2';
+import Modal from 'react-modal';
 
 
 export default class NN_InfoDetailComponent extends React.Component {
@@ -58,8 +60,11 @@ export default class NN_InfoDetailComponent extends React.Component {
             tBarChartBTData:null,
             pBarChartBTData:null,
             trueColor:"#8884d8",
-            falseColor:"#FF6384"   
+            falseColor:"#FF6384",
+            modalViewMenu : null,
+            openModalFlag : false
         };
+        this.closeModal = this.closeModal.bind(this);
     }
     /////////////////////////////////////////////////////////////////////////////////////////
     // Common Function
@@ -305,6 +310,23 @@ export default class NN_InfoDetailComponent extends React.Component {
             }
         }
     }
+
+    closeModal() { 
+        this.setState({openModalFlag: false})
+    }
+
+    clickOpenModalMenu(selectedValue){
+        let value = selectedValue
+        if(value.target != undefined){
+            value = selectedValue.target.attributes.alt.value
+            this.setState({modalViewMenu : <NN_InfoDetailMemoModal closeModal={this.closeModal} 
+                                                                nn_id={this.state.nn_id}
+                                                                nn_wf_ver_id={value}/>})
+            this.setState({openModalFlag: true})
+        }
+        
+    }
+
     /////////////////////////////////////////////////////////////////////////////////////////
     // Version Line Chart
     /////////////////////////////////////////////////////////////////////////////////////////
@@ -346,7 +368,6 @@ export default class NN_InfoDetailComponent extends React.Component {
             }
         }
     }
-
     /////////////////////////////////////////////////////////////////////////////////////////
     // Batch Table Action
     /////////////////////////////////////////////////////////////////////////////////////////  
@@ -451,6 +472,8 @@ export default class NN_InfoDetailComponent extends React.Component {
         optionYN.push(<option key={k++} value={"Y"}>{"Y"}</option>)
         optionYN.push(<option key={k++} value={"N"}>{"N"}</option>)
 
+        let memoImg = "./images/ico_menu06.png"
+
         for(let rows in this.state.NN_TableWFData){
             let colData = [];
             let row = this.state.NN_TableWFData[rows]
@@ -515,11 +538,9 @@ export default class NN_InfoDetailComponent extends React.Component {
                                         onClick = {this.clickSeletVersion.bind(this)} > {predloss} </td>)
             colData.push(<td key={k++} alt = {row["nn_wf_ver_id"]} 
                                         onClick = {this.clickSeletVersion.bind(this)} > {row["train_model_exists"]} </td>)
-            colData.push(<td key={k++} width="50" > < input type = "button" name="btn1"
-                                                                    alt = {row["nn_wf_ver_id"]} 
-                                                                    value = {"Memo"}
-                                                                    
-                                                                    style={{"textAlign":"center", "width":"100%"}} /></td>)
+            colData.push(<td key={k++} > <img style ={{width:20, "cursor":"pointer"}} alt = {row["nn_wf_ver_id"]}
+                                                onClick={this.clickOpenModalMenu.bind(this)} 
+                                                src={memoImg} /></td>)
             colData.push(<td key={k++} width="50" > < input type = "button" name="btn2"
                                                                     alt = {row["nn_wf_ver_id"]} 
                                                                     value = {"Train"}
@@ -677,6 +698,14 @@ export default class NN_InfoDetailComponent extends React.Component {
                     <table className="table detail" ref= 'master2' >
                         {wfInfoListTable}
                     </table>
+
+                    <Modal className="modal" overlayClassName="modal" isOpen={this.state.openModalFlag}
+                            onRequestClose={this.closeModal}
+                            contentLabel="Modal" >
+                        <div className="modal-dialog modal-lg">
+                          {this.state.modalViewMenu}
+                        </div>
+                    </Modal>    
                 </div>
            
 
@@ -782,3 +811,4 @@ export default class NN_InfoDetailComponent extends React.Component {
 NN_InfoDetailComponent.defaultProps = {
     reportRepository: new ReportRepository(new Api())
 };
+
