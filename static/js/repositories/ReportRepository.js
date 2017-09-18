@@ -26,7 +26,10 @@ export default class ReportRepository {
 
     getCommonNNInfo(params) {
         return this.api.get('/api/v1/type/common/target/nninfo/nnid/'+params+'/', '').then((data) => {
-            data = JSON.parse(data);
+            if(data != undefined){
+                data = JSON.parse(data);
+            }
+
             this.log("getCommonNNInfo", data)
             return data;
         });
