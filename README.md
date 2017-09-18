@@ -65,6 +65,11 @@ Tools -> Command Pallette
 
 4. npm install
 
+if node error
+
+curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
+sudo apt-get install -y nodejs
+
 cd /home/dev/tensormsa_gui/static
 
 apt-get install npm
