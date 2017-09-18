@@ -209,7 +209,7 @@ export default class NN_InfoNewCompDetail1 extends React.Component {
                         <h1> Network Config ({this.state.netType}) </h1>
                     </div>
  
-                    <JsonConfComponent ref="netconfig" NN_TableDataDetail={this.state.NN_TableDataDetail} />
+                    <JsonConfComponent ref="netconfig" editable="Y" NN_TableDataDetail={this.state.NN_TableDataDetail} />
 
                     <table className="table detail">
                     <tr>

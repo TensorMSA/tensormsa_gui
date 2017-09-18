@@ -525,11 +525,13 @@ export default class JsonConfComponent extends React.Component {
                                     </td>)
                     }else{
                         let datatype = row[cols].type
+
                         if(datatype == "int"){
                             datatype = "number"
                         }else{
                             datatype = "string"
                         }
+                        
 
                         if(rowData == arrayData){
                             colData.push(<td key={k++} type={datatype} style={{"color":this.state.color}} > {rowData} </td>)
@@ -539,8 +541,15 @@ export default class JsonConfComponent extends React.Component {
                             rowData = "null"
                             colData.push(<td key={k++} type={datatype} style={{"color":this.state.color}} > {rowData} </td>)
                         }else{
-                            colData.push(<td key={k++} style={{"color":this.state.color}} > 
-                                < input type = {datatype} style={{"textAlign":"center", "width":"100%", "fontWeight":"bold"}} defaultValue = {rowData} />  </td>)
+                            if(this.props.editable == "Y"){
+                                colData.push(<td key={k++} style={{"color":this.state.color}} > 
+                                    < input type = {datatype} 
+                                            style={{"textAlign":"center", "width":"100%", "fontWeight":"bold"}} 
+                                            defaultValue = {rowData} />  </td>)
+                            }else{
+                                colData.push(<td key={k++} type={datatype} 
+                                                           style={{"color":this.state.color, "fontWeight":"bold"}} > {rowData} </td>)
+                            }
                         }
                         
                     }

@@ -16,6 +16,7 @@
   "dependencies": {
     "@types/react": "^0.14.41",
     "@types/react-dom": "^0.14.17",
+    "chart.js": "^2.7.0",
     "crossfilter": "^1.3.12",
     "d3": "^3.5.17",
     "dc": "^2.0.0-beta.32",
@@ -24,10 +25,12 @@
     "fixed-data-table": "^0.6.4",
     "isomorphic-fetch": "^2.2.1",
     "material-design-lite": "^1.2.1",
+    "rc-progress": "^2.2.2",
     "react": "^15.3.2",
     "react-addons-css-transition-group": "^15.4.1",
     "react-alert": "^1.0.14",
     "react-bootstrap-table": "^2.5.8",
+    "react-chartjs-2": "^2.6.2",
     "react-data-grid": "^2.0.49",
     "react-dom": "^15.3.2",
     "react-dropzone-component": "^1.0.4",
@@ -36,6 +39,8 @@
     "react-modal": "^1.5.2",
     "react-router": "^2.8.1",
     "react-table": "^6.3.0",
+    "react-tabs": "^2.0.0",
+    "recharts": "^1.0.0-apha.5",
     "seedrandom": "^2.4.2"
   },
   "devDependencies": {

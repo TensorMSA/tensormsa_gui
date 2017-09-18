@@ -146,6 +146,24 @@ export default class ReportRepository {
         });
     }
 
+    //Auto Ml Run
+    postCommonNNInfoAutoSetup(params, jsonData) {
+        return this.api.post('/api/v1/type/automl/state/parm/nnid/'+params+'/', jsonData).then((data) => {
+            data = JSON.parse(data);
+            this.log("postCommonNNInfoAutoSetup", data)
+            return data;
+        });
+    }
+
+    //Auto Ml Run
+    postCommonNNInfoAuto(params) {
+        return this.api.get('/api/v1/type/automl/state/train/nnid/'+params+'/', '').then((data) => {
+            data = JSON.parse(data);
+            this.log("getCommonNNInfoAuto", data)
+           return data;
+        });
+    }
+
     //Run Train
     postTainRun(params, wf_ver_id) {
         return this.api.post('/api/v1/type/runmanager/state/train/nnid/'+params+'/ver/'+wf_ver_id+'/', '').then((data) => {

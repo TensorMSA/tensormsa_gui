@@ -29,8 +29,9 @@ export default class NN_InfoDetailComponent extends React.Component {
                                 ,{index:8,      id:"pred_acc_info",     name:"Predict Batch Acc"}
                                 ,{index:9,      id:"pred_loss_info",    name:"Predict Batch Loss"}
                                 ,{index:10,     id:"pred_model_exists", name:"Predict Model"}
-                                ,{index:11,     id:"nn_wf_ver_desc"   , name:"Memo"}
-                                ,{index:12,     id:"train", name:"Train"}
+                                ,{index:11,     id:"batch"            , name:"Batch"}
+                                ,{index:12,     id:"nn_wf_ver_desc"   , name:"Memo"}
+                                ,{index:13,     id:"train", name:"Train"}
                             ],
             NN_TableBTData: null,
             NN_TableColArr2:[    {index:0,      id:"nn_batch_ver_id",   name:"Batch Version"}
@@ -91,14 +92,6 @@ export default class NN_InfoDetailComponent extends React.Component {
     /////////////////////////////////////////////////////////////////////////////////////////
     // Top Button Function
     /////////////////////////////////////////////////////////////////////////////////////////
-    batchView(){
-        if(this.state.isViewBatch == true){
-            this.setState({ isViewBatch: false })
-        }else{
-            this.setState({ isViewBatch: true })
-        }
-    }
-
     fileView(){
         if(this.state.isViewFile == true){
             this.setState({ isViewFile: false })
@@ -277,6 +270,7 @@ export default class NN_InfoDetailComponent extends React.Component {
             value = selectedValue.target.attributes.alt.value   
         }
         this.clickChangeVersion(value)
+        this.state.isViewBatch = false
     }
 
     clickTrainVersion(selectedValue){//Version Train을 선택했을때 훈련을 하고 재 조회 해준다. ..
@@ -325,6 +319,18 @@ export default class NN_InfoDetailComponent extends React.Component {
             this.setState({openModalFlag: true})
         }
         
+    }
+
+    batchView(selectedValue){
+        this.clickSeletVersion(selectedValue)
+
+        if(this.state.isViewBatch == true){
+            this.setState({ isViewBatch: false })
+        }else{
+            this.setState({ isViewBatch: true })
+        }
+
+
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
@@ -426,6 +432,9 @@ export default class NN_InfoDetailComponent extends React.Component {
 
 
     render() {
+        let batchImg = "./images/ico_menu05.png"
+        let memoImg = "./images/ico_menu06.png"
+
         this.state.nn_id = this.props.nn_id
         /////////////////////////////////////////////////////////////////////////////////////////
         // Common Function
@@ -471,8 +480,6 @@ export default class NN_InfoDetailComponent extends React.Component {
         let optionYN = []
         optionYN.push(<option key={k++} value={"Y"}>{"Y"}</option>)
         optionYN.push(<option key={k++} value={"N"}>{"N"}</option>)
-
-        let memoImg = "./images/ico_menu06.png"
 
         for(let rows in this.state.NN_TableWFData){
             let colData = [];
@@ -538,6 +545,9 @@ export default class NN_InfoDetailComponent extends React.Component {
                                         onClick = {this.clickSeletVersion.bind(this)} > {predloss} </td>)
             colData.push(<td key={k++} alt = {row["nn_wf_ver_id"]} 
                                         onClick = {this.clickSeletVersion.bind(this)} > {row["train_model_exists"]} </td>)
+            colData.push(<td key={k++} > <img style ={{width:20, "cursor":"pointer"}} alt = {row["nn_wf_ver_id"]}
+                                                onClick={this.batchView.bind(this)} 
+                                                src={batchImg} /></td>)
             colData.push(<td key={k++} > <img style ={{width:20, "cursor":"pointer"}} alt = {row["nn_wf_ver_id"]}
                                                 onClick={this.clickOpenModalMenu.bind(this)} 
                                                 src={memoImg} /></td>)
@@ -687,8 +697,6 @@ export default class NN_InfoDetailComponent extends React.Component {
             <section>
             <div className="container paddingT10">
                 <div className="tblBtnArea">
-                    <button type="button" className="save" onClick={() => this.batchView()} >Batch</button>
-                    <button type="button" className="save" onClick={() => this.fileView()} >File</button>
                     <button type="button" className="addnew" onClick={() => this.addVersion() } >Add Ver</button>
                     <button type="button" className="save" onClick={() => this.saveData()} >Save</button>
                 </div>
@@ -798,7 +806,7 @@ export default class NN_InfoDetailComponent extends React.Component {
 
                 <div>
                     <h1> Network Config ({this.state.nodeType}) </h1>
-                    <JsonConfComponent ref="netconfig" NN_TableDataDetail={this.state.NN_TableNodeDataSort} />
+                    <JsonConfComponent ref="netconfig" editable="N" NN_TableDataDetail={this.state.NN_TableNodeDataSort} />
                 </div>
 
 
