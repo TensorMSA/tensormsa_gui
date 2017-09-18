@@ -9,6 +9,7 @@ import ReportRepository from './repositories/ReportRepository';
 import Api from './utils/Api';
 import NN_InfoNewComponent from './NNConfiguration/NN_InfoNewComponent'
 import NN_InfoDetailComponent from './NNConfiguration/NN_InfoDetailComponent'
+import NN_InfoApplicationList from './NNConfiguration/NN_InfoApplicationList'
 
 export default class HomeComponent extends React.Component {
     constructor(props) {
@@ -103,6 +104,8 @@ export default class HomeComponent extends React.Component {
               return this.getTimeStatistics();
           case 6:
               return this.getPredictResult(); 
+          case 7:
+              return this.getApplicationList(); 
           }
     }
 
@@ -147,7 +150,9 @@ export default class HomeComponent extends React.Component {
         }
     }
 
-    
+    getApplicationList(){
+            this.setState({NN_InfoList: <NN_InfoApplicationList  getHeaderEvent={this.getHeaderEvent}/> });   
+    }
 
     render() {
         return (

@@ -1,5 +1,5 @@
 export default {
     getApiServerUrl() {
-        return  'http://52.78.67.19:8989';
+        return  'http://localhost:8000';
     }
 };	
