@@ -1,8 +1,5 @@
 export default {
     getApiServerUrl() {
-        return  'http://52.78.67.19:8989';
-    },
-    getWebServerUrl() {
-        return  'http://52.78.67.19:8889';
+        return  'http://13.124.78.189:8000';
     }
-};	
+};

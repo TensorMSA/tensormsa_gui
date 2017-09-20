@@ -1,9 +1,10 @@
 # tensormsa_gui - exclude NPM modules 
-/tensormsa_gui/static/node_modules/
-/tensormsa_gui/templates/npm-debug.log
+/static/node_modules/
+/templates/npm-debug.log
 npm-debug.log
-/tensormsa_gui/static/js/constants/EnvConstants.js
-/tensormsa_gui/static/dist/NetConf.js
-/tensormsa_gui/static/dist/NetConf.js.map
-/tensormsa_gui/static/dist/TensorMSA.js
-/tensormsa_gui/static/dist/TensorMSA.js.map
+/static/js/constants/EnvConstants.js
+/static/dist/NetConf.js
+/static/dist/NetConf.js.map
+/static/dist/TensorMSA.js
+/static/dist/TensorMSA.js.map
+/static/js/constants/EnvConstants.js

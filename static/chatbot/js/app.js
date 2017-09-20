@@ -4,7 +4,7 @@ $(document).ready(function() {
 });
 
 var myBotApp = {
-    ajaxServiceUrl: "http://localhost:8000",
+    ajaxServiceUrl: "http://13.124.165.96:8000",
     ajaxRequestMessageMethod: "PUT",
     ajaxRequestMessageApiPath: "/api/v1/type/service/chatbot/cb0001/",
     fileTranferImageUploadApiPath: "/",

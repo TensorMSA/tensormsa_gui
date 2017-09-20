@@ -5,16 +5,13 @@ export default class MainSectionComponent extends React.Component {
         return (   
                 <section>
 	            	<div className="main_visual_area">
-						<ul className="visual_img">
-							<li><img src="images/main_visual01.jpg" alt="" /></li>
-							<li className="on"><img src="images/main_visual02.jpg" alt=""/></li>
-						</ul>
+						<div><img src="images/main_visual01.png" alt="" />
+						</div>
 						<div className="visual_txt_area">
 							<p className="visual_txt">
-								<strong>HOYA is a Deep Learning Artificial Intelligence</strong>
+								<strong>TensorMSA is a Machine Learning Artificial Intelligence</strong>
 								Framework Based on Tensorflow
 							</p>
-							<a href="#none">Get Started</a>
 						</div>
 					</div>
 					<div className="main_contents_area">
