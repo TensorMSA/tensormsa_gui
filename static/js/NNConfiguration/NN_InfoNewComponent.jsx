@@ -125,7 +125,7 @@ export default class NN_InfoNewComponent extends React.Component {
         let aparam = {}
         for (let i=0 ; i < tableAuto.rows.length ; i++) {
             title = tableAuto.rows[i].cells[this.findColInfo(col, "id", "title").index].innerText
-            input_data = tableAuto.rows[i].cells[this.findColInfo(col, "id", "input_data").index].children[0].value
+            input_data = tableAuto.rows[i].cells[this.findColInfo(col, "id", "input_data").index].children[0].value*1
             aparam[this.state.NN_TableRowArr2[i]] = input_data
         }
 
@@ -151,35 +151,32 @@ export default class NN_InfoNewComponent extends React.Component {
 
         // let nn_id = "nn00000001"
         // let wf_ver_id = "1"
-
+                // // Make NN WF Info
+                // this.props.reportRepository.postCommonNNInfoWF(nn_id, wfparam).then((wf_ver_id) => {
+                //     this.setState({ wf_ver_id: wf_ver_id })
+                //     // Make NN WF Node Info
+                //     this.props.reportRepository.postCommonNNInfoWFNode(nn_id, wf_ver_id, nodeparam).then((tableData) => {
+                        // Train File Save
 
         let re = confirm( "Are you create?" )
         if(re == true){
             // Make NN Info
             this.props.reportRepository.postCommonNNInfo("", dparam).then((nn_id) => {
                 this.setState({ nn_id: nn_id })
-                // Make NN WF Info
-                this.props.reportRepository.postCommonNNInfoWF(nn_id, wfparam).then((wf_ver_id) => {
-                    this.setState({ wf_ver_id: wf_ver_id })
-                    // Make NN WF Node Info
-                    this.props.reportRepository.postCommonNNInfoWFNode(nn_id, wf_ver_id, nodeparam).then((tableData) => {
-                        // Train File Save
-                        desc = "train_data"
+                desc = "train_data"
+                this.props.reportRepository.getCommonNNInfoWFNode(nn_id, wf_ver_id, desc).then((tableData) => {
+                    desc = tableData[0]["fields"]["nn_wf_node_name"]
+                    this.props.reportRepository.putFileUpload(nn_id, wf_ver_id, desc, tfparam).then((tableData) => {
+                        // Eval File Save
+                        desc = "eval_data"
                         this.props.reportRepository.getCommonNNInfoWFNode(nn_id, wf_ver_id, desc).then((tableData) => {
                             desc = tableData[0]["fields"]["nn_wf_node_name"]
-                            this.props.reportRepository.putFileUpload(nn_id, wf_ver_id, desc, tfparam).then((tableData) => {
-                                // Eval File Save
-                                desc = "eval_data"
-                                this.props.reportRepository.getCommonNNInfoWFNode(nn_id, wf_ver_id, desc).then((tableData) => {
-                                    desc = tableData[0]["fields"]["nn_wf_node_name"]
-                                    this.props.reportRepository.putFileUpload(nn_id, wf_ver_id, desc, efparam).then((tableData) => {
-                                        //Set AutoML Parameter
-                                        this.props.reportRepository.postCommonNNInfoAutoSetup(nn_id, aparam).then((tableData) => {
-                                            //Run AutoML
-                                            this.props.reportRepository.postCommonNNInfoAuto(nn_id).then((tableData) => {
-                                            
-                                            });
-                                        });
+                            this.props.reportRepository.putFileUpload(nn_id, wf_ver_id, desc, efparam).then((tableData) => {
+                                //Set AutoML Parameter
+                                this.props.reportRepository.postCommonNNInfoAutoSetup(nn_id, aparam).then((tableData) => {
+                                    //Run AutoML
+                                    this.props.reportRepository.postCommonNNInfoAuto(nn_id).then((tableData) => {
+                                    
                                     });
                                 });
                             });

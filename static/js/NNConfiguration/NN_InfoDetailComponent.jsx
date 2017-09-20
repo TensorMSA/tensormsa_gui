@@ -4,11 +4,13 @@ import Api from './../utils/Api'
 import FileUploadComponent from './../NNLayout/common/FileUploadComponent'
 import JsonConfComponent from './../NNLayout/common/JsonConfComponent'
 import NN_InfoDetailStackBar from './../NNConfiguration/NN_InfoDetailStackBar'
+import NN_InfoDetailLine from './../NNConfiguration/NN_InfoDetailLine'
 import NN_InfoDetailMemoModal from './../NNConfiguration/NN_InfoDetailMemoModal';
 import { Line, LineChart, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import {Pie} from 'react-chartjs-2';
 import Modal from 'react-modal';
-
+import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+import 'react-tabs/style/react-tabs.scss';
 
 export default class NN_InfoDetailComponent extends React.Component {
     constructor(props, context) {
@@ -54,16 +56,16 @@ export default class NN_InfoDetailComponent extends React.Component {
             nn_titlebt:"Network Batch List ",
             nodeType:null,
             netType:null,
-            isViewBatch:true,
+            isViewBatch:false,
             isViewFile:true,
             color:"black",
             acclossLineChartBTData:null,
             tBarChartBTData:null,
             pBarChartBTData:null,
-            trueColor:"#8884d8",
-            falseColor:"#FF6384",
             modalViewMenu : null,
-            openModalFlag : false
+            openModalFlag : false,
+            tabIndex : 1,
+            active_color : "#14c0f2"
         };
         this.closeModal = this.closeModal.bind(this);
     }
@@ -103,22 +105,27 @@ export default class NN_InfoDetailComponent extends React.Component {
     addVersion(){//Version New를 생성해준다.
         let re = confirm( "Are you create version?" )
         if(re == true){
-            // WF 신규 생성 Make NN WF Info
-            let wfparam = {}
-            wfparam["nn_def_list_info_nn_id"] = ""
-            wfparam["nn_wf_ver_info"] = "init"
-            wfparam["condition"] = "1"
-            wfparam["active_flag"] = "N"
+            // // WF 신규 생성 Make NN WF Info
+            // let wfparam = {}
+            // wfparam["nn_def_list_info_nn_id"] = ""
+            // wfparam["nn_wf_ver_info"] = "init"
+            // wfparam["condition"] = "1"
+            // wfparam["active_flag"] = "N"
 
-            // Make NN WF Node Info
-            let nodeparam = {}
-            nodeparam["type"] = this.state.netType
+            // // Make NN WF Node Info
+            // let nodeparam = {}
+            // nodeparam["type"] = this.state.netType
 
-            this.props.reportRepository.postCommonNNInfoWF(this.state.nn_id, wfparam).then((wf_ver_id) => {
-                // Make NN WF Node Info
-                this.props.reportRepository.postCommonNNInfoWFNode(this.state.nn_id, wf_ver_id, nodeparam).then((tableData) => {
-                    this.getCommonNNInfoWF(this.state.nn_id)
-                    });
+            // this.props.reportRepository.postCommonNNInfoWF(this.state.nn_id, wfparam).then((wf_ver_id) => {
+            //     // Make NN WF Node Info
+            //     this.props.reportRepository.postCommonNNInfoWFNode(this.state.nn_id, wf_ver_id, nodeparam).then((tableData) => {
+            //         this.getCommonNNInfoWF(this.state.nn_id)
+            //         });
+            // });
+
+            //Run AutoML
+            this.props.reportRepository.postCommonNNInfoAuto(this.state.nn_id).then((tableData) => {
+            
             });
         }
     }
@@ -322,11 +329,13 @@ export default class NN_InfoDetailComponent extends React.Component {
     }
 
     batchView(selectedValue){
+        let tfflage = this.state.isViewBatch
+        if(selectedValue.target.alt != this.state.nn_wf_ver_id){
+            tfflage = false
+        }
         this.clickSeletVersion(selectedValue)
 
-        if(this.state.isViewBatch == true){
-            this.setState({ isViewBatch: false })
-        }else{
+        if(tfflage == false){
             this.setState({ isViewBatch: true })
         }
 
@@ -430,6 +439,11 @@ export default class NN_InfoDetailComponent extends React.Component {
         }
     }
 
+    networkSelectTab(value){
+        // let tab = value.target.innerText
+        value = value.tabIndex + 1
+        this.setState({ tabIndex: value })
+    }
 
     render() {
         let batchImg = "./images/ico_menu05.png"
@@ -503,7 +517,7 @@ export default class NN_InfoDetailComponent extends React.Component {
             }
 
             if(row["active_flag"] == "Y"){
-                this.state.color = "red"
+                this.state.color = this.state.active_color
             }else{
                 this.state.color = "black"
             }
@@ -583,12 +597,12 @@ export default class NN_InfoDetailComponent extends React.Component {
             }
 
             if(row["eval_flag"] == "Y" || row["active_flag"] == "Y"){
-                this.state.color = "red"
+                this.state.color = this.state.active_color
             }else{this.state.color = "black"}
             colData.push(<td key={k++} alt={row["nn_batch_ver_id"]} style={{"color":this.state.color, "fontWeight":"bold"}}> {row["nn_batch_ver_id"]} </td>)
 
             if(row["eval_flag"] == "Y"){
-                this.state.color = "red"
+                this.state.color = this.state.active_color
             }else{this.state.color = "black"}
             colData.push(<td key={k++} width="120" >
                                         <div>
@@ -605,7 +619,7 @@ export default class NN_InfoDetailComponent extends React.Component {
                                     </td>)
 
             if(row["active_flag"] == "Y"){
-                this.state.color = "red"
+                this.state.color = this.state.active_color
             }else{this.state.color = "black"}
             colData.push(<td key={k++} width="120" >
                                         <div>
@@ -632,7 +646,7 @@ export default class NN_InfoDetailComponent extends React.Component {
             colData.push(<td key={k++} alt={row["nn_batch_ver_id"]} > {row["true_false_percent"]} % </td>)
 
             if(row["eval_flag"] == "Y" || row["active_flag"] == "Y"){
-                this.state.color = "red"
+                this.state.color = this.state.active_color
             }else{this.state.color = "black"}
             colData.push(<td key={k++} alt={row["nn_batch_ver_id"]} style={{"color":this.state.color, "fontWeight":"bold"}}> {row["model"]} </td>)
 
@@ -681,7 +695,7 @@ export default class NN_InfoDetailComponent extends React.Component {
                 }else{
                     colData.push(<td key={k++} alt={this.state.NN_TableColArr3[i]["name"]} 
                                      onClick = {this.clickNodeConfig.bind(this)}
-                                     style={{"color":"red", "fontWeight":"bold", "cursor":"pointer"}}> {config} </td>)
+                                     style={{"color":this.state.active_color, "fontWeight":"bold", "cursor":"pointer"}}> {config} </td>)
                 }
                 
             }
@@ -696,17 +710,23 @@ export default class NN_InfoDetailComponent extends React.Component {
 
             <section>
             <div className="container paddingT10">
+                
                 <div className="tblBtnArea">
                     <button type="button" className="addnew" onClick={() => this.addVersion() } >Add Ver</button>
                     <button type="button" className="save" onClick={() => this.saveData()} >Save</button>
                 </div>
+                
 
-                <div ref="versionInfo">
-                    <h1> {this.state.nn_title} </h1>
-                    <table className="table detail" ref= 'master2' >
+                <h1> {this.state.nn_title} </h1>    
+                <table style={{ "width":"100%" }} ><tr><td>
+                <div style={{ "overflow":"auto", "height":300}}>      
+                    <table className="table detail" ref= 'master2'  >
+                    
                         {wfInfoListTable}
+                    
                     </table>
-
+                </div>
+                </td></tr></table>
                     <Modal className="modal" overlayClassName="modal" isOpen={this.state.openModalFlag}
                             onRequestClose={this.closeModal}
                             contentLabel="Modal" >
@@ -714,14 +734,6 @@ export default class NN_InfoDetailComponent extends React.Component {
                           {this.state.modalViewMenu}
                         </div>
                     </Modal>    
-                </div>
-           
-
-
-                 <div>
-                    <h1> Train Model Accuracy chart ({this.state.nn_batch_id})</h1>
-                    <NN_InfoDetailStackBar ref="stackbar" NN_Data={this.state.tBarChartBTData} />
-                </div>
 
                 {this.state.isViewBatch ?
                     <div>
@@ -735,6 +747,26 @@ export default class NN_InfoDetailComponent extends React.Component {
                     <div>
                     </div>
                 }
+
+                <Tabs defaultIndex={0}  onSelect={tabIndex => this.networkSelectTab({ tabIndex })} >
+                <TabList>
+                  <Tab>Version List</Tab>
+                  <Tab>Auto ML List</Tab>
+                </TabList>
+
+                <TabPanel>
+                    <div>
+                        <h1> Train Model Accuracy chart ({this.state.nn_batch_id})</h1>
+                        <NN_InfoDetailStackBar ref="stackbar" NN_Data={this.state.tBarChartBTData} />
+                    </div>
+                </TabPanel>
+                <TabPanel>
+                    <div>
+                        <h1> Auto ML ({this.state.nn_batch_id})</h1>
+                        <NN_InfoDetailLine ref="line" NN_Data={this.state.tBarChartBTData} />
+                    </div>
+                </TabPanel>
+                </Tabs>
 
                 {this.state.isViewFile ?
                     <div ref="fileUploadDiv">

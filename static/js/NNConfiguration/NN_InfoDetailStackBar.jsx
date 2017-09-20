@@ -29,10 +29,10 @@ export default class NN_InfoDetailStackBar extends React.Component {
                                     ]
                                 }]
                             },
-            trueColor:"#8884d8",
-            falseColor:"#FF6384",
-            pieMainColor:"#36A2EB",
-            pieSubColor:["#FFCE56","#66ff33","#ddccff","#ff80ff","#ff9900","#999966","#33cccc","#ff66ff","#F85F73"] 
+            trueColor:"#14c0f2",
+            falseColor:"#ff8022",
+            pieMainColor:"#14c0f2",
+            pieSubColor:["#ff8022","#ffcf3b","#47de8a","#999966","#33cccc","#ff66ff","#F85F73"] 
         };
     }
     /////////////////////////////////////////////////////////////////////////////////////////
@@ -156,6 +156,7 @@ export default class NN_InfoDetailStackBar extends React.Component {
         };
 
         this.setState({ pieChartData: pieChartData })
+
     }
 
 

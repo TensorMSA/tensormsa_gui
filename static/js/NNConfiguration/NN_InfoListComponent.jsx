@@ -25,7 +25,8 @@ export default class NN_InfoListComponent extends React.Component {
                             ],
             selModalView: null,
             NN_ID : null,
-            nextpageInit:"init"
+            nextpageInit:"init",
+            nn_color:"#14c0f2"
         };
     }
 
@@ -244,7 +245,7 @@ export default class NN_InfoListComponent extends React.Component {
 
 
             colData.push(<td key={k++} alt = {row["nn_id"]} > {row["dir"]} </td>) 
-            colData.push(<td key={k++} alt = {row["nn_id"]} style ={{"color":"blue", "cursor":"pointer", "fontWeight":"bold"}}
+            colData.push(<td key={k++} alt = {row["nn_id"]} style ={{"color":this.state.nn_color, "cursor":"pointer", "fontWeight":"bold"}}
                                                             onClick={() => this.handleClick(row) } > {row["nn_id"]} </td>) 
             colData.push(<td key={k++} alt = {row["nn_id"]} > {row["nn_wf_ver_id"]} </td>)
 
@@ -278,6 +279,7 @@ export default class NN_InfoListComponent extends React.Component {
 
                     <br/>
                     <div>
+                        <h1 className="bullet"> Network List </h1>
                         <table className="table detail" ref= 'master2' >
                             {nnInfoNewListTable}
                         </table>

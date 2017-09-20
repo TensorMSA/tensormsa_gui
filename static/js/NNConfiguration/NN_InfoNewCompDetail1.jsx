@@ -13,6 +13,10 @@ import JsonConfComponent from './../NNLayout/common/JsonConfComponent'
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import 'react-tabs/style/react-tabs.scss';
 
+import { downloadFile } from 'download-url-file';
+
+
+
 export default class NN_InfoNewCompDetail1 extends React.Component {
     constructor(props, context) {
         super(props);
@@ -101,8 +105,12 @@ export default class NN_InfoNewCompDetail1 extends React.Component {
         this.handleChangeRadio(value)
     }
 
-    fileDownload(value){
-        console.log(value)
+    fileDownloadFunc(selectedValue){
+        let path = selectedValue.target.alt
+        let url = EnvConstants.getWebServerUrl()+path
+
+        console.log(url)
+        downloadFile(url);
     }
 
 
@@ -132,7 +140,10 @@ export default class NN_InfoNewCompDetail1 extends React.Component {
         let nnInfoNewList = [];
         if (this.state.NN_TableData != null) {
             for (var i in this.state.NN_TableData) {
-                nnInfoNewList[i] = {id:this.state.NN_TableData[i]["pk"], desc:this.state.NN_TableData[i]["fields"]["graph_flow_desc"]};
+                nnInfoNewList[i] = {id:this.state.NN_TableData[i]["pk"]
+                                    , desc:this.state.NN_TableData[i]["fields"]["graph_flow_desc"]
+                                    , path:this.state.NN_TableData[i]["fields"]["train_file_path"]
+                                    };
             }
         }
         nnInfoNewList = sortByKey(nnInfoNewList, 'id');
@@ -163,8 +174,8 @@ export default class NN_InfoNewCompDetail1 extends React.Component {
             colDataSL.push(<td key={k++} value = {row["id"]} onClick={this.handleChangeRadio.bind(this)} > {row["id"]} </td>) 
             colDataSL.push(<td key={k++} value = {row["id"]} style={{"textAlign":"left"}} onClick={this.handleChangeRadio.bind(this)} > {row["desc"]} </td>) 
             clickUrl = "./images/ico_menu03.png"
-            colDataSL.push(<td key={k++} > <img style ={{width:20, "cursor":"pointer"}} alt = {row["id"]}
-                                                onClick={this.fileDownload.bind(this)} 
+            colDataSL.push(<td key={k++} > <img style ={{width:20, "cursor":"pointer"}} alt = {row["path"]}
+                                                onClick={this.fileDownloadFunc.bind(this)} 
                                                 src={clickUrl} /></td>)
             clickUrl = "./images/ico_help_on.png"
             colDataSL.push(<td key={k++} > <img style ={{width:20, "cursor":"pointer"}} alt = {row["id"]}
@@ -182,10 +193,6 @@ export default class NN_InfoNewCompDetail1 extends React.Component {
 
         return (
             <section>
-                    <div>
-                        <h1> Network Select </h1>
-                    </div>
-
                     <div>
                         <table className="table detail" ref= 'master2' >
                             {nnInfoNewListTable}
