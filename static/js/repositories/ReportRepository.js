@@ -35,6 +35,16 @@ export default class ReportRepository {
         });
     }
 
+
+    //Network WF Info
+    putBotSetupInfo(params, jsonData) {
+        return this.api.post('/api/v1/type/service/botbuilder/def/', jsonData).then((data) => {
+            data = JSON.parse(data);
+            this.log("putBotSetupInfo", data)
+            return data;
+        });
+    }
+
     //Network WF Info
     postCommonNNInfoWF(params, jsonData) {
         return this.api.post('/api/v1/type/common/target/nninfo/nnid/'+params+'/version/', jsonData).then((data) => {
@@ -157,7 +167,7 @@ export default class ReportRepository {
 
     //Auto Ml Run
     postCommonNNInfoAuto(params) {
-        return this.api.post('/api/v1/type/automl/state/train/nnid/'+params+'/', '').then((data) => {
+        return this.api.get('/api/v1/type/automl/state/train/nnid/'+params+'/', '').then((data) => {
             data = JSON.parse(data);
             this.log("getCommonNNInfoAuto", data)
            return data;
