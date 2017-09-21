@@ -69,21 +69,15 @@ export default class NN_InfoApplicationList extends React.Component {
             dparam[inDefault[i]] = input_data
         }
 
-        // let nn_id = "nn00000001"
-        // let wf_ver_id = "1"
 
+        // Make NN Info
+        this.props.reportRepository.putBotSetupInfo("", dparam).then((nn_id) => {
+            dparam["use_flag"] = "Y"
 
-        let re = confirm( "Are you create Bot?" )
-        if(re == true){
-            // Make NN Info
-            this.props.reportRepository.putBotSetupInfo("", dparam).then((nn_id) => {
-                console.log(dparam)
-                //this.setState({ nn_id: nn_id })
-                // Make NN WF Info
-            });
-        } 
+            console.log(dparam)
+        });
+
     }
-
 
     render() {
         let k = 1
@@ -92,23 +86,25 @@ export default class NN_InfoApplicationList extends React.Component {
         /////////////////////////////////////////////////////////////////////////////////////////
         let nnInfoDefault = [];
         if (this.state.NN_TableMaster == null){
-            this.state.NN_TableMaster = [   {title:"Chatbot ID"       , width:10    , input_data:"cb0002", ex:"ex) ERP, MES, SCM"}
-                                            ,{title:"Chatbot Category"    , width:10    , input_data:"service", ex:"ex) MRO"}
-                                            ,{title:"Chatbot SubCategory"          , width:100    , input_data:"info_bot", ex:"ex) MRO Classification"}
-                                            ,{title:"Tagging Type"    , width:10    , input_data:"dict", ex:"ex) MRO"}
-                                          //  ,{title:"Proper Noun"    , width:10    , input_data:"{"tagdate": [1, "/hoya_model_root/chatbot/date.txt", False]}", ex:"ex) Proper Noun"}
-
-                                            // ,{title:"Intent Model"    , width:10    , input_data:"", ex:"ex) MRO"}
-                                            // ,{title:"NER Model"    , width:10    , input_data:"", ex:"ex) MRO"}
-                                            // ,{title:"Intent ID"    , width:10    , input_data:"", ex:"ex) MRO"}
-                                            // ,{title:"Story ID"    , width:10    , input_data:"", ex:"ex) MRO"}
-                                            // ,{title:"Entity Type"    , width:10    , input_data:"", ex:"ex) MRO"}
-
-
+            this.state.NN_TableMaster = [   
+                                            {title:"Chatbot ID" , width:10 , input_data:"cb0002", ex:"ex) chatbot id"}
+                                            ,{title:"Chatbot Category" , width:10 , input_data:"service", ex:"ex) Category"}
+                                            ,{title:"Chatbot SubCategory" , width:10 , input_data:"info_bot", ex:"ex) Sub"}
+                                            ,{title:"Tagging Type" , width:10  , input_data:"dict", ex:"ex) Tagging Info"}
+                                            ,{title:"Proper Noun" , width:10 , input_data:"{'tagdate': [1, '/hoya_model_root/chatbot/date.txt', False]}", ex:"ex) Proper Noun"}
+                                            ,{title:"Intent Model" , width:10 , input_data:"", ex:"ex) Intent Model Name"}
+                                            ,{title:"NER Model" , width:10 , input_data:"", ex:"ex) NER Model Name"}
+                                            ,{title:"Intent ID" , width:10 , input_data:"1", ex:"ex) Intent"}
+                                            ,{title:"entity_type" , width:10 , input_data:"key", ex:""}
+                                            ,{title:"entity_list" , width:10 , input_data:"{'key': ['tagdate', 'tagloc', 'tagmenu']}", ex:"JSON Format"}
+                                            ,{title:"Story ID" , width:10 , input_data:"1", ex:"ex) 1,2,3,4,5"}
+                                            ,{title:"Story Type" , width:10 , input_data:"response", ex:"ex) response / default"}
+                                            ,{title:"Entity Type" , width:10 ,input_data:"", ex:"ex) "}
+                                            ,{title:"Response Type" , width:10 , input_data:"entity", ex:"ex) entity / default"}
+                                            ,{title:"Output Entity" , width:10 , input_data:"{'entity':['tagdate','tagloc','tagmenu']}", ex:"ex) "}
                                          ];
         }
         nnInfoDefault = this.state.NN_TableMaster
-
         
         function sortByKey(array, key) {
             return array.sort(function(a, b) {
@@ -149,6 +145,7 @@ export default class NN_InfoApplicationList extends React.Component {
             <section>
                 <h1 className="hidden">tensor MSA main table</h1>
                 <div className="container paddingT10">
+                    <div><img src="./images/chatbot_ico.png" width="128" height="128"></img></div>
                     <div className="tblBtnArea">
                         <button type="button" className="save" onClick={() => this.saveData()} >Save</button>
                     </div>

@@ -7,8 +7,7 @@ var envPlugin = new webpack.DefinePlugin({
 
 module.exports = {
     entry: {
-        TensorMSA: './js/app.js',
-        NetConf: './ts/netConf.ts'
+        TensorMSA: './js/app.js'
     }, // Multiple Entry
     devtool: 'sourcemaps',
     cache: true,
@@ -19,7 +18,7 @@ module.exports = {
     },
     resolve: {
         // Add `.ts` and `.tsx` as a resolvable extension. 
-        extensions: ['', '.webpack.js', '.web.js', '.js', '.jsx', '.ts', '.tsx']
+        extensions: ['', '.webpack.js', '.web.js', '.js', '.jsx']
     },  
     // When to use Minification, 
     plugins : [
@@ -36,12 +35,6 @@ module.exports = {
                 {
                     presets:['es2015','react']
                 }
-            },
-            {
-                // test: A condition that must be met <-> exclude
-                test: /\.tsx?$/,
-                exclude: /node_modules/,  
-                loader: 'ts-loader'
             },
             {
                 test: /\.css$/, 
@@ -62,9 +55,7 @@ module.exports = {
             }
         ]
     },
-    ts : { // set compiler which is used by ts-loader
-        compiler : 'typescript'
-    },
+
     node: {
         fs: "empty"
     }
