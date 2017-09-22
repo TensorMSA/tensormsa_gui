@@ -2,7 +2,7 @@ var path = require('path');
 var webpack = require('webpack');
 
 var envPlugin = new webpack.DefinePlugin({
-    // __API_SERVER__: "http://52.78.19.96:8989"//JSON.stringify(process.env.API_SERVER)
+    // __API_SERVER__: "http://localhost:8989"//JSON.stringify(process.env.API_SERVER)
 });
 
 module.exports = {

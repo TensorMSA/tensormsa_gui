@@ -19,7 +19,7 @@ export default class NN_HeaderComponent extends React.Component {
     }
 
     setFilter(filter){
-		console.log("[Header]" + filter + "," + JSON.stringify(this.context))
+		//console.log("[Header]" + filter + "," + JSON.stringify(this.context))
         this.setState({selected  : filter})
         switch (filter) {
             case 1:
@@ -61,7 +61,6 @@ export default class NN_HeaderComponent extends React.Component {
 				}
             case 7:
             	return this.props.getHeaderEvent(7);
-	        
         }
     }
 
@@ -91,10 +90,6 @@ export default class NN_HeaderComponent extends React.Component {
             	if(this.context.NN_TYPE == 'cifar' || this.context.NN_TRAIN){
 	                return ((value===this.state.selected) ? 'current':'');
 	            }
-            case 7:
-            	if(this.context.NN_ID != 'cifar'){
-	                return ((value===this.state.selected) ? 'current':'');
-	            }
         }   	
     }
 
@@ -117,7 +112,7 @@ export default class NN_HeaderComponent extends React.Component {
 						<li className={this.isActive(2)}><a href="#" onClick={this.setFilter.bind(this, 2)}>Net Detail</a></li>
 						<li className={this.isActive(4)}><a href="#" onClick={this.setFilter.bind(this, 4)}>Net Create</a></li>  
 						<li className={this.isActive(5)}><a href="#" onClick={this.setFilter.bind(this, 5)}>Monitering</a></li>
-						<li className={this.isActive(7)}><a href="#" onClick={this.setFilter.bind(this, 7)}>App</a></li>
+						<li className={this.isActive(7)}><a href="#" onClick={this.setFilter.bind(this, 7)}>Application</a></li>
 					</ul>
 				</nav>
 					<dl className="utilMenu">

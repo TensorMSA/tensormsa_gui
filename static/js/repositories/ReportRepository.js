@@ -39,8 +39,8 @@ export default class ReportRepository {
     //Network WF Info
     putBotSetupInfo(params, jsonData) {
         return this.api.post('/api/v1/type/service/botbuilder/def/', jsonData).then((data) => {
-            data = JSON.parse(data);
             this.log("putBotSetupInfo", data)
+            data = JSON.parse(data);
             return data;
         });
     }

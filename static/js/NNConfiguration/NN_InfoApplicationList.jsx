@@ -61,20 +61,30 @@ export default class NN_InfoApplicationList extends React.Component {
         }
         
         // Make NN Info
-        let inDefault = ["", "biz_cate","biz_sub_cate","nn_title","nn_desc"]
+        let inDefault = ["test", "cb_id","intent_id"]// "biz_cate","biz_sub_cate","nn_title","nn_desc"]
         let dparam = {}
-        for (let i=1 ; i < table.rows.length ; i++) {
+        //for (let i=1 ; i < table.rows.length ; i++) {
+        for (let i=1 ; i < 2 ; i++) {
             title = table.rows[i].cells[this.findColInfo(col, "id", "title").index].innerText
             input_data = table.rows[i].cells[this.findColInfo(col, "id", "input_data").index].children[0].value
             dparam[inDefault[i]] = input_data
+            console.log(inDefault[i] + " " + input_data )
         }
+        console.log(dparam)
 
 
+        dparam["chat_cate"]=  "service",
+        dparam["chat_sub_cate"] = "info_bot",
+        dparam["cb_title"] = "info_bot",
+        dparam["cb_desc"] = "info_bot",
+        dparam["creation_date"]= "2017-05-22T18:00:00.000",
+        dparam["last_update_date"]= "2017-05-22T18:00:00.000",
+        dparam["created_by"] = "KSS",
+        dparam["last_updated_by"] = "KSS"
         // Make NN Info
-        this.props.reportRepository.putBotSetupInfo("", dparam).then((nn_id) => {
+        this.props.reportRepository.putBotSetupInfo("", dparam).then((dparam) => {
             dparam["use_flag"] = "Y"
 
-            console.log(dparam)
         });
 
     }
@@ -92,14 +102,14 @@ export default class NN_InfoApplicationList extends React.Component {
                                             ,{title:"Chatbot SubCategory" , width:10 , input_data:"info_bot", ex:"ex) Sub"}
                                             ,{title:"Tagging Type" , width:10  , input_data:"dict", ex:"ex) Tagging Info"}
                                             ,{title:"Proper Noun" , width:10 , input_data:"{'tagdate': [1, '/hoya_model_root/chatbot/date.txt', False]}", ex:"ex) Proper Noun"}
-                                            ,{title:"Intent Model" , width:10 , input_data:"", ex:"ex) Intent Model Name"}
-                                            ,{title:"NER Model" , width:10 , input_data:"", ex:"ex) NER Model Name"}
+                                            ,{title:"Intent Model" , width:10 , input_data:"wcnntest02", ex:"ex) Intent Model Name"}
+                                            ,{title:"NER Model" , width:10 , input_data:"lstmcrf0002", ex:"ex) NER Model Name"}
                                             ,{title:"Intent ID" , width:10 , input_data:"1", ex:"ex) Intent"}
                                             ,{title:"entity_type" , width:10 , input_data:"key", ex:""}
                                             ,{title:"entity_list" , width:10 , input_data:"{'key': ['tagdate', 'tagloc', 'tagmenu']}", ex:"JSON Format"}
                                             ,{title:"Story ID" , width:10 , input_data:"1", ex:"ex) 1,2,3,4,5"}
                                             ,{title:"Story Type" , width:10 , input_data:"response", ex:"ex) response / default"}
-                                            ,{title:"Entity Type" , width:10 ,input_data:"", ex:"ex) "}
+                                            ,{title:"Entity Type" , width:10 ,input_data:"key", ex:"ex) "}
                                             ,{title:"Response Type" , width:10 , input_data:"entity", ex:"ex) entity / default"}
                                             ,{title:"Output Entity" , width:10 , input_data:"{'entity':['tagdate','tagloc','tagmenu']}", ex:"ex) "}
                                          ];
