@@ -1,8 +1,8 @@
 // Core variables
-/*@import "variables";
+@import "variables";
 @import "mixins";
 // Reset
-@import "normalize";
+/*@import "normalize";
 //Component
 @import "option";
 @import "bullet";
@@ -20,9 +20,10 @@
 @import "label";
 @import "option-select";
 @import "layer-box";
-@import "img-box";
+@import "img-box";*/
+
 @import "modal";
-@import "object";
+/*@import "object";
 @import "scroll";
 @import "predict-box";
 @import "train";

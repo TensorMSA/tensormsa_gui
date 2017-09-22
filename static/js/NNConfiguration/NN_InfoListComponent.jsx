@@ -38,8 +38,8 @@ export default class NN_InfoListComponent extends React.Component {
     getCommonNNInfo(params) {
         this.props.reportRepository.getCommonNNInfo(params).then((tableData) => {
             this.setState({ NN_TableData: null })//조회시 한번 Reset을 해주어야 테이블이 새로고침 된다.
-            this.setState({ NN_TableData: tableData })//조회한 것을 화면에 반영한다.
-            this.state.NN_TableDataFilter = tableData//Filter Search할때 기준이 되는 데이터를 넘겨준다.
+            this.setState({ NN_TableData: tableData['fields'] })//조회한 것을 화면에 반영한다.
+            this.state.NN_TableDataFilter = tableData['fields']//Filter Search할때 기준이 되는 데이터를 넘겨준다.
         });   
     }
 
@@ -272,23 +272,18 @@ export default class NN_InfoListComponent extends React.Component {
                 <h1 className="hidden">tensor MSA main table</h1>
                 <div className="container paddingT10">
                     <div className="tblBtnArea">
-                        <button type="button" className="addnew" onClick={() => this.addCommonNNInfo() } >Add Net</button>
+                        <button type="button" className="addnew" 
+                                style={{"marginRight":"5px"}}
+                                onClick={() => this.addCommonNNInfo() } >Add Net</button>
                         <button type="button" className="delete" onClick={() => this.deleteCommonNNInfo()} >Delete</button>
                     </div>
 
-
-                    <br/>
                     <div>
                         <h1 className="bullet"> Network List </h1>
                         <table className="table detail" ref= 'master2' >
                             {nnInfoNewListTable}
                         </table>
                     </div>
-                    
-
-
-
-
 
                 </div>
             </section>

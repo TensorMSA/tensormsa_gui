@@ -149,7 +149,7 @@ export default class NN_InfoNewComponent extends React.Component {
         efparam["first_tmp_folder"] = this.state.tmp_eval_node_name
         efparam["last_tmp_folder"] = this.state.eval_node_name
 
-        // let nn_id = "nn00000001"
+        //  "nn00000030"
         // let wf_ver_id = "1"
                 // // Make NN WF Info
                 // this.props.reportRepository.postCommonNNInfoWF(nn_id, wfparam).then((wf_ver_id) => {
@@ -159,30 +159,37 @@ export default class NN_InfoNewComponent extends React.Component {
                         // Train File Save
 
         let re = confirm( "Are you create?" )
+        let nn_id = ""
+        let nn_node = ""
+        let netconf_data_name = ""
+        let eval_data_name = ""
         if(re == true){
             // Make NN Info
-            this.props.reportRepository.postCommonNNInfo("", dparam).then((nn_id) => {
-                this.setState({ nn_id: nn_id })
-                desc = "train_data"
-                this.props.reportRepository.getCommonNNInfoWFNode(nn_id, wf_ver_id, desc).then((tableData) => {
-                    desc = tableData[0]["fields"]["nn_wf_node_name"]
-                    this.props.reportRepository.putFileUpload(nn_id, wf_ver_id, desc, tfparam).then((tableData) => {
-                        // Eval File Save
-                        desc = "eval_data"
-                        this.props.reportRepository.getCommonNNInfoWFNode(nn_id, wf_ver_id, desc).then((tableData) => {
-                            desc = tableData[0]["fields"]["nn_wf_node_name"]
-                            this.props.reportRepository.putFileUpload(nn_id, wf_ver_id, desc, efparam).then((tableData) => {
-                                //Set AutoML Parameter
-                                this.props.reportRepository.postCommonNNInfoAutoSetup(nn_id, aparam).then((tableData) => {
-                                    //Run AutoML
-                                    this.props.reportRepository.postCommonNNInfoAuto(nn_id).then((tableData) => {
-                                    
-                                    });
+            this.props.reportRepository.postCommonNNInfo("", dparam).then((tableData) => {
+                nn_id = tableData['nn_id']
+                this.setState({ nn_id : nn_id })
+                for(let i in tableData['graph']){
+                    nn_node = tableData['graph'][i]['fields']['graph_node']
+                    if(nn_node == 'netconf_data'){
+                        netconf_data_name = tableData['graph'][i]['fields']['graph_node_name']
+                    }
+                    if(nn_node == 'eval_data'){
+                        eval_data_name = tableData['graph'][i]['fields']['graph_node_name']
+                    }
+                }
+
+                if(netconf_data_name != "" && eval_data_name != "")
+                    this.props.reportRepository.putFileUpload(nn_id, 'common', netconf_data_name, tfparam).then((tableData) => {
+                        this.props.reportRepository.putFileUpload(nn_id, 'common', eval_data_name, efparam).then((tableData) => {
+                            //Set AutoML Parameter
+                            this.props.reportRepository.postCommonNNInfoAutoSetup(nn_id, aparam).then((tableData) => {
+                                //Run AutoML
+                                this.props.reportRepository.postCommonNNInfoAuto(nn_id).then((tableData) => {
+                                
                                 });
                             });
                         });
                     });
-                });
             });
         } 
     }

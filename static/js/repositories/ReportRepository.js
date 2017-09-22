@@ -167,7 +167,7 @@ export default class ReportRepository {
 
     //Auto Ml Run
     postCommonNNInfoAuto(params) {
-        return this.api.get('/api/v1/type/automl/state/train/nnid/'+params+'/', '').then((data) => {
+        return this.api.post('/api/v1/type/automl/state/train/nnid/'+params+'/', '').then((data) => {
             data = JSON.parse(data);
             this.log("getCommonNNInfoAuto", data)
            return data;
@@ -180,6 +180,15 @@ export default class ReportRepository {
             data = JSON.parse(data);
             this.log("postTainRun", data)
             return data;
+        });
+    }
+
+    //View
+    getCommonNodeInfoView(params) {
+        return this.api.get('/api/v1/type/automl/state/stat/nnid/'+params+'/', '').then((data) => {
+            data = JSON.parse(data);
+            this.log("getCommonNodeInfoView", data)
+           return data;
         });
     }
 

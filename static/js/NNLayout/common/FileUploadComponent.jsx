@@ -131,15 +131,19 @@ export default class FileUploadComponent extends React.Component {
         let fileTable = []
         fileTable.push(<thead ref='thead' key={k++} className="center">{tableHeader}</thead>)
         fileTable.push(<tbody ref='tbody' key={k++} className="center" >{tableData}</tbody>)
-
+//"float":"left",
         return (
             <div>
-            <table className="table marginT10">
+                <h2 style={{"margin-right":"5px","verticalAlign":"top"}}>{this.props.title}</h2>
               {this.props.uploadbtnflag ?
+                <div>
+        
                 <div> 
-                    <FileUpload options={this.fileOption}>
+            
+                    <FileUpload options={this.fileOption} >
                         <button ref="chooseAndUpload" id='fileeval' name = 'eval'>FileUpload</button>
-                    </FileUpload>
+                    </FileUpload></div>
+                
                 </div>
                 :
                     <div>
@@ -163,7 +167,7 @@ export default class FileUploadComponent extends React.Component {
                     <div>
                     </div>
                 }
-            </table>
+  
                 </div>
         )
     }

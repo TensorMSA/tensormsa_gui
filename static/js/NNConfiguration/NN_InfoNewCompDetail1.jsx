@@ -213,37 +213,40 @@ export default class NN_InfoNewCompDetail1 extends React.Component {
                     }
 
                     <div>
-                        <h1> Network Config ({this.state.netType}) </h1>
+                        <h2> Network Config ({this.state.netType}) </h2>
                     </div>
  
                     <JsonConfComponent ref="netconfig" editable="Y" NN_TableDataDetail={this.state.NN_TableDataDetail} />
-
+ <div>
                     <table className="table detail">
                     <tr>
                     <td style={{"verticalAlign":"top"}}>
-                    <h1> Network Train Source File Upload </h1>
-                    <FileUploadComponent ref="trainfilesrc" 
-                                            nn_id={this.props.tmp_train_node_name} 
-                                            nn_wf_ver_id={"1"} 
-                                            nn_node_name={this.props.train_node_name} 
-                                            nn_path_type={"source"}
-                                            uploadbtnflag={true} 
-                                            deletebtnflag={true} />
+
+                        <FileUploadComponent ref="trainfilesrc" 
+                                              title="Network Train Source File Upload"
+                                                nn_id={this.props.tmp_train_node_name} 
+                                                nn_wf_ver_id={"1"} 
+                                                nn_node_name={this.props.train_node_name} 
+                                                nn_path_type={"source"}
+                                                uploadbtnflag={true} 
+                                                deletebtnflag={true} />
                     </td>
 
                     <td style={{"verticalAlign":"top"}}>
-                    <h1> Network Eval Source File Upload </h1>
-                    <FileUploadComponent ref="evalfilesrc" 
-                                            nn_id={this.props.tmp_eval_node_name} 
-                                            nn_wf_ver_id={"1"} 
-                                            nn_node_name={this.props.eval_node_name} 
-                                            nn_path_type={"source"}
-                                            uploadbtnflag={true} 
-                                            deletebtnflag={true} />
-                    </td>
+
+                        <FileUploadComponent ref="evalfilesrc" 
+                                                title="Network Eval Source File Upload"
+                                                nn_id={this.props.tmp_eval_node_name} 
+                                                nn_wf_ver_id={"1"} 
+                                                nn_node_name={this.props.eval_node_name} 
+                                                nn_path_type={"source"}
+                                                uploadbtnflag={true} 
+                                                deletebtnflag={true} />
+                        </td>
 
                     </tr>
                     </table>
+                    </div>
             </section>
 
         );

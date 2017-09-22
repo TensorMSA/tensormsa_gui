@@ -203,24 +203,19 @@ export default class NN_InfoDetailStackBar extends React.Component {
                   }
 
                   return (
-                    <div className="custom-tooltip">
-                      <table style={{"backgroundColor":"white", "fontWeight":"bold"}}>
-                          <tr><td>
-                            <p className="intro" style={{"color":"black"}}>{this.getIntroOfPage(label)}</p>
-                          </td></tr>
-                          <tr><td>
-                            <p className="intro" style={{"color":"black"}}>
+                    <div className="custom-tooltip" style={{"backgroundColor":"white"}}>
+
+                            <p style={{"color":"black"}}>{this.getIntroOfPage(label)}</p>
+                   
+                            <p style={{"color":"black"}}>
                                 {" "+this.getIntroOfPage(payloadName0+" : "+payloadValue0)+" "}</p>
-                          </td></tr>
-                          <tr><td>
-                            <p className="intro" style={{"color":"black"}}>
+                     
+                            <p style={{"color":"black"}}>
                                 {" "+this.getIntroOfPage(payloadName1+" : "+payloadValue1)+" "}</p>
-                          </td></tr>
-                          <tr><td>
-                            <p className="intro" style={{"color":"black"}}>
+                        
+                            <p style={{"color":"black"}}>
                                 {" "+this.getIntroOfPage("Acc : "+avg)+" "}</p>
-                          </td></tr>
-                      </table>
+                 
                     </div>
                   );
                 }
@@ -228,14 +223,14 @@ export default class NN_InfoDetailStackBar extends React.Component {
             return null;
           }
         });
-                     
+                             
         return (  
 
             <section>
             <div className="container paddingT10">
 
-           
-                <table className="table detail" ref="barchart">
+                
+                    <table ref="barchart_rechart" className="chart">
                         <tr>
                         <td width="60%">
                             <ResponsiveContainer width='100%' height={200}>
@@ -257,13 +252,7 @@ export default class NN_InfoDetailStackBar extends React.Component {
                             </ResponsiveContainer>  
                         </td>
                         </tr>
-                </table>
-
-
-
-  
-                
-    
+                </table>  
 
                
             </div>

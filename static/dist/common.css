@@ -2,7 +2,7 @@
 html,body{overflow:hidden;margin:0;padding:0;webkit-text-size-adjust:none;}
 html{height:100%;} 
 body{height:100%;overflow-x:auto;font-family:Apple Gothic,'맑은 고딕',Malgun Gothic,'돋움',dotum,sans-serif;font-size:13px;line-height:1.39;color:#333;}
-table{width:100%;border-collapse:separate;border-spacing:0;font-size:1em;table-layout:fixed;}
+table{width:97%;border-collapse:separate;border-spacing:0;font-size:1em;table-layout:fixed;}
 caption{display:none;}
 td{word-wrap:break-word;}
 a{color:#333;text-decoration:none;outline:none;}

@@ -12,7 +12,8 @@ export default class JsonConfComponent extends React.Component {
             fileData:null,
             nn_id:null,
             nn_wf_ver_id:null,
-            color : "red",
+            color : "#14c0f2",
+            lastdata:"last",
             arrayData : "[ ]",
             jsonData : "{ }"    
         };
@@ -31,7 +32,12 @@ export default class JsonConfComponent extends React.Component {
         let rowspan = data.rowSpan // Table Cell RowSpan
         let edit = data.contentEditable // Table Cell Editable
         let type = data.getAttribute("type") // Table Last Cell Type ex) number, string
-        let color = data.style.color
+
+        let lastdata = ""
+        if(data.attributes.alt != undefined){
+            lastdata = data.attributes.alt.value
+        }
+        // let color = data.style.color
 
         if(childcnt > 0){// 마지막 값인 경우 childcnt를 가진다.
             let childN = data.children[0]
@@ -42,7 +48,8 @@ export default class JsonConfComponent extends React.Component {
                    text = childN.childNodes[0].selectedOptions[0].value
                 }
                 type = "sel"
-                color = childN.childNodes[0].style.color
+                // color = childN.childNodes[0].style.color
+                lastdata = this.state.lastdata
             }else{// 일반적인 Text 값을 가져온다.
                 text = data.children[0].value
                 type = data.children[0].type
@@ -62,7 +69,7 @@ export default class JsonConfComponent extends React.Component {
         redata.push(rowspan)
         redata.push(edit)
         redata.push(type)
-        redata.push(color)
+        redata.push(lastdata)
 
         return redata
     }
@@ -71,7 +78,7 @@ export default class JsonConfComponent extends React.Component {
     getConfigData(makeType){
         let noconfTable = this.refs.master3
         let tdata = noconfTable.rows
-        let sColor = this.state.color
+        let sColor = this.state.lastdata
 
         let preData = []
         let params = {}
@@ -141,7 +148,7 @@ export default class JsonConfComponent extends React.Component {
                     }
                     
                 }else if(vcolor != sColor && vdata != "" && isNaN(vdata) == false ){//자식이 컬럼이면서 숫자인 경우는 배열이다. 
-                    if(param[textdata] == undefined || param[textdata] == false || param[textdata] == null){// 값이 없의 면서 Json
+                    if(param[textdata] == undefined || (param[textdata] == false && param[textdata] != 0) || param[textdata] == null){// 값이 없의 면서 Json
                         param[textdata] = [] 
                     }  
 
@@ -170,6 +177,7 @@ export default class JsonConfComponent extends React.Component {
                     }
                     param = param[textdata]
                 }
+
             }
         }
         return params
@@ -516,6 +524,7 @@ export default class JsonConfComponent extends React.Component {
                                         <div>
                                         <select ref={"sel"+k} 
                                                id={k} 
+                                               alt ={this.state.lastdata}
                                                 defaultValue={defaultVal[0]}
                                                style={{"color":this.state.color, "width":"100%", "fontWeight":"bold"}}
                                                rowSpan={1}>
@@ -534,20 +543,26 @@ export default class JsonConfComponent extends React.Component {
                         
 
                         if(rowData == arrayData){
-                            colData.push(<td key={k++} type={datatype} style={{"color":this.state.color}} > {rowData} </td>)
+                            colData.push(<td key={k++} type={datatype} alt ={this.state.lastdata} 
+                                style={{"color":this.state.color}} > {rowData} </td>)
                         }else if(rowData == jsonData){
-                            colData.push(<td key={k++} type={datatype} style={{"color":this.state.color}} > {rowData} </td>)
+                            colData.push(<td key={k++} type={datatype} alt ={this.state.lastdata} 
+                                style={{"color":this.state.color}} > {rowData} </td>)
                         }else if(rowData == null){
                             rowData = "null"
-                            colData.push(<td key={k++} type={datatype} style={{"color":this.state.color}} > {rowData} </td>)
+                            colData.push(<td key={k++} type={datatype} alt ={this.state.lastdata} 
+                                style={{"color":this.state.color}} > {rowData} </td>)
                         }else{
                             if(this.props.editable == "Y"){
-                                colData.push(<td key={k++} style={{"color":this.state.color}} > 
+                                colData.push(<td key={k++} alt ={this.state.lastdata} style={{"color":this.state.color}} > 
                                     < input type = {datatype} 
-                                            style={{"textAlign":"center", "width":"100%", "fontWeight":"bold"}} 
+                                            style={{"color":this.state.color
+                                                    ,"textAlign":"center"
+                                                    , "width":"100%"
+                                                    , "fontWeight":"bold"}} 
                                             defaultValue = {rowData} />  </td>)
                             }else{
-                                colData.push(<td key={k++} type={datatype} 
+                                colData.push(<td key={k++} alt ={this.state.lastdata} type={datatype} 
                                                            style={{"color":this.state.color, "fontWeight":"bold"}} > {rowData} </td>)
                             }
                         }
