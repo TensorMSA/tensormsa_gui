@@ -10,7 +10,7 @@ export default class NN_InfoDetailLine extends React.Component {
         this.state = {
             NN_DataPre:null,
             NN_Data:null,
-            NN_Labels:null,
+            NN_Labels:[],
             lineChartLabels:null,
             lineChartData:null,
             trueColor:"#14c0f2",
@@ -29,42 +29,28 @@ export default class NN_InfoDetailLine extends React.Component {
       let best = lineData['best']
       let bygen = lineData['bygen']
 
-
-      bygen =
-        {
-          0:
-{
-        0:{'generation': 0, 'nn_wf_ver_id': 3, 'flag': 'True', 'nn_id': 'nn00000099', 'survive': 'True', 'acc': 0.4424}
-      ,1:{'generation': 0, 'nn_wf_ver_id': 1, 'flag': 'True', 'nn_id': 'nn00000099', 'survive': 'True', 'acc': 0.2232323}
-      ,2:{'generation': 0, 'nn_wf_ver_id': 2, 'flag': 'True', 'nn_id': 'nn00000099', 'survive': 'False', 'acc': 0.2453}
-},1:{
-      0:{'generation': 0, 'nn_wf_ver_id': 3, 'flag': 'True', 'nn_id': 'nn00000099', 'survive': 'True', 'acc': 0.45454324}
-      ,1:{'generation': 0, 'nn_wf_ver_id': 1, 'flag': 'True', 'nn_id': 'nn00000099', 'survive': 'True', 'acc': 0.2232}
-      ,2:{'generation': 0, 'nn_wf_ver_id': 4, 'flag': 'True', 'nn_id': 'nn00000099', 'survive': 'False', 'acc': 0.23435}
-    }
-    ,2:{
-      0:{'generation': 0, 'nn_wf_ver_id': 5, 'flag': 'True', 'nn_id': 'nn00000099', 'survive': 'True', 'acc': 0.45454324}
-      ,1:{'generation': 0, 'nn_wf_ver_id': 1, 'flag': 'True', 'nn_id': 'nn00000099', 'survive': 'True', 'acc': 0.2232}
-      ,2:{'generation': 0, 'nn_wf_ver_id': 3, 'flag': 'True', 'nn_id': 'nn00000099', 'survive': 'False', 'acc': 0.23435}
-    }
-    }
-
-
-
-
       let data = []
     
       for(let rows in bygen){
         let subData = {}
         let row = bygen[rows]
+        let avg = 0
         for(let col in row){
           subData['name'] = 'Gen'+(rows*1+1)
           subData[row[col]['nn_wf_ver_id']+''] = (row[col]['acc']*100).toFixed(2)*1
+          avg = avg + (row[col]['acc']*100).toFixed(2)*1
           subData['s'+row[col]['nn_wf_ver_id']] = row[col]['survive']
+
+          if(this.state.NN_Labels.indexOf(row[col]['nn_wf_ver_id']) == -1){
+            this.state.NN_Labels.push(row[col]['nn_wf_ver_id'])
+          }
         }
+
+        subData['avg'] = (avg/row.length).toFixed(2)*1
         data.push(subData)
 
       }
+      this.state.NN_Labels = this.state.NN_Labels.sort()
       this.setState({ NN_Data: data })
 
 
@@ -94,21 +80,11 @@ export default class NN_InfoDetailLine extends React.Component {
           this.setLineChartData(lineData)
         }
 
-
-
-        // this.state.NN_Data = [{name: 'Gen1', '1': 590, '2': 800 , '3':900, avg: 710},
-        //                       {name: 'Gen2', '1': 868, '2': 967, '3':1000, avg: 900},
-        //                       {name: 'Gen3', '1': 1397, '2': 1098, '3':1000, avg: 1150}
-        //                       ]
-
         let lineChart = [];
-        for(let i in this.state.NN_Data){
-          console.log(i)
+        for(let i in this.state.NN_Labels){
+          lineChart.push(    <Bar key={k++} dataKey={this.state.NN_Labels[i]} barSize={20} fill={getRandomColor()}/>)
         }
-        
-        lineChart.push(    <Bar key={k++} dataKey='1' barSize={20} fill='#413ea0'/>)
-        lineChart.push(    <Bar key={k++} dataKey='2' barSize={20} fill='#8884d8'/>)
-        lineChart.push(    <Line key={k++}  dataKey='3' type='monotone' stroke='#ff7300'/>)
+        lineChart.push(    <Line key={k++}  dataKey='avg' type='monotone' stroke='#ff7300'/>)
 
         return (  
 
