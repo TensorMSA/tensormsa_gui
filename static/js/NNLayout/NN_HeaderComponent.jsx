@@ -111,8 +111,8 @@ export default class NN_HeaderComponent extends React.Component {
 						<li className={this.isActive(1)}><a href="#" onClick={this.setFilter.bind(this, 1)}>Net Info</a></li>
 						<li className={this.isActive(2)}><a href="#" onClick={this.setFilter.bind(this, 2)}>Net Detail</a></li>
 						<li className={this.isActive(4)}><a href="#" onClick={this.setFilter.bind(this, 4)}>Net Create</a></li>  
-						<li className={this.isActive(5)}><a href="#" onClick={this.setFilter.bind(this, 5)}>Monitering</a></li>
-						<li className={this.isActive(7)}><a href="#" onClick={this.setFilter.bind(this, 7)}>Application</a></li>
+						<li className={this.isActive(5)}><a href="#" onClick={this.setFilter.bind(this, 5)}>Monitoring</a></li>
+						<li className={this.isActive(7)}><a href="#" onClick={this.setFilter.bind(this, 7)}>App List</a></li>
 					</ul>
 				</nav>
 					<dl className="utilMenu">

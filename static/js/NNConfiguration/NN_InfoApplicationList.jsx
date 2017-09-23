@@ -7,6 +7,7 @@ import JsonConfComponent from './../NNLayout/common/JsonConfComponent'
 import NN_InfoNewCompDetail1 from './../NNConfiguration/NN_InfoNewCompDetail1'
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import 'react-tabs/style/react-tabs.scss';
+import EnvConstants from './../constants/EnvConstants';
 
 export default class NN_InfoApplicationList extends React.Component {
     constructor(props, context) {
@@ -89,12 +90,16 @@ export default class NN_InfoApplicationList extends React.Component {
 
     }
 
+    runChat(){
+        let params = "width=800,height=1000";
+        window.open(EnvConstants.getWebServerUrl()+"/chatbot/index.html","chatbot",params)
+    }
+
     render() {
         let k = 1
         /////////////////////////////////////////////////////////////////////////////////////////
         // First Network Default
         /////////////////////////////////////////////////////////////////////////////////////////
-        let nnInfoDefault = [];
         if (this.state.NN_TableMaster == null){
             this.state.NN_TableMaster = [   
                                             {title:"Chatbot ID" , width:10 , input_data:"cb0002", ex:"ex) chatbot id"}
@@ -113,14 +118,6 @@ export default class NN_InfoApplicationList extends React.Component {
                                             ,{title:"Response Type" , width:10 , input_data:"entity", ex:"ex) entity / default"}
                                             ,{title:"Output Entity" , width:10 , input_data:"{'entity':['tagdate','tagloc','tagmenu']}", ex:"ex) "}
                                          ];
-        }
-        nnInfoDefault = this.state.NN_TableMaster
-        
-        function sortByKey(array, key) {
-            return array.sort(function(a, b) {
-                var x = a[key]; var y = b[key];
-                return ((x < y) ? -1 : ((x > y) ? 1 : 0));
-            });
         }
 
         function makeHeader(data){// Make header
@@ -147,9 +144,45 @@ export default class NN_InfoApplicationList extends React.Component {
             tableData.push(<tr key={k++}>{colData}</tr>)
         }
 
+        let tableData2 = []
+        for(let rows in this.state.NN_TableMaster){
+            let colData = [];
+            let row = this.state.NN_TableMaster[rows]
+            colData.push(<td key={k++} style={{ "width":"20%"}}> {row["title"]} </td>)
+            colData.push(<td key={k++} > < input type = {"string"} style={{"textAlign":"center", "width":"100%"}} 
+                                                        defaultValue = {row["input_data"]}
+                                                        maxLength = {row["width"]}  />  </td>)
+            colData.push(<td key={k++} style={{"textAlign":"left", "width":"30%"}} > {row["ex"]} </td>)
+
+            tableData2.push(<tr key={k++}>{colData}</tr>)
+        }
+
+        let tableData3 = []
+        for(let rows in this.state.NN_TableMaster){
+            let colData = [];
+            let row = this.state.NN_TableMaster[rows]
+            colData.push(<td key={k++} style={{ "width":"20%"}}> {row["title"]} </td>)
+            colData.push(<td key={k++} > < input type = {"string"} style={{"textAlign":"center", "width":"100%"}} 
+                                                        defaultValue = {row["input_data"]}
+                                                        maxLength = {row["width"]}  />  </td>)
+            colData.push(<td key={k++} style={{"textAlign":"left", "width":"30%"}} > {row["ex"]} </td>)
+
+            tableData3.push(<tr key={k++}>{colData}</tr>)
+        }
+
+
         let masterListTable = []
         masterListTable.push(<thead ref='thead' key={k++} className="center">{tableHeader}</thead>)
         masterListTable.push(<tbody ref='tbody' key={k++} className="center" >{tableData}</tbody>)
+
+        let intentInfoTable = []
+        intentInfoTable.push(<thead ref='thead' key={k++} className="center">{tableHeader}</thead>)
+        intentInfoTable.push(<tbody ref='tbody' key={k++} className="center" >{tableData}</tbody>)
+
+        let nerInfoTable = []
+        nerInfoTable.push(<thead ref='thead' key={k++} className="center">{tableHeader}</thead>)
+        nerInfoTable.push(<tbody ref='tbody' key={k++} className="center" >{tableData}</tbody>)
+
 
         return (
             <section>
@@ -157,17 +190,34 @@ export default class NN_InfoApplicationList extends React.Component {
                 <div className="container paddingT10">
                     <div><img src="./images/chatbot_ico.png" width="128" height="128"></img></div>
                     <div className="tblBtnArea">
-                        <button type="button" className="save" onClick={() => this.saveData()} >Save</button>
+                        <button type="button" className="addnew" style={{"marginRight":"5px"}} onClick={() => this.saveData()} >Save</button>
+                        <button type="button" className="save" onClick={() => this.runChat()} >Run Chat</button>
                     </div>
 
                     <div>
-                        <h1> Bot Framework </h1>
+                        <h1> Bot Info </h1>
                     </div>
 
 
                     <div ref="masterInfo">
                         <table className="table detail" ref= 'master1' >
                             {masterListTable}
+                        </table>
+                    </div>
+                    <div>
+                        <h1> Intend Info </h1>
+                    </div>
+                    <div ref="intentInfo">
+                        <table className="table detail" ref= 'master1' >
+                            {intentInfoTable}
+                        </table>
+                    </div>
+                    <div>
+                        <h1> NER Info </h1>
+                    </div>
+                    <div ref="nerInfo">
+                        <table className="table detail" ref= 'master1' >
+                            {nerInfoTable}
                         </table>
                     </div>
                 </div>

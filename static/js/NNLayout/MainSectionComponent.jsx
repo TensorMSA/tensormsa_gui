@@ -9,8 +9,8 @@ export default class MainSectionComponent extends React.Component {
 						</div>
 						<div className="visual_txt_area">
 							<p className="visual_txt">
-								<strong>TensorMSA is a Machine Learning Artificial Intelligence</strong>
-								Framework Based on Tensorflow
+								<strong>TensorMSA is Machine Learning API</strong>
+								MicroServiceArchitecthre with Python and Tensorflow
 							</p>
 						</div>
 					</div>
