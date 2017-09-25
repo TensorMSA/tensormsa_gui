@@ -480,11 +480,11 @@ export default class JsonConfComponent extends React.Component {
         // NetConf Table Header Make
         /////////////////////////////////////////////////////////////////////////////////////////
         let tableHeader = []; //make header
-        let colDatas = ["col1"]
+        let colDatas = ["Depth1"]
         if(rNode.colcnt > 0){
             colDatas = []
             for(let i=0;i < rNode.colcnt ; i++){
-                colDatas.push("col"+(i+1))
+                colDatas.push("Depth"+(i+1))
             }
         }
         let headerData = []
@@ -570,7 +570,8 @@ export default class JsonConfComponent extends React.Component {
                     }
                 }else{
                     if(row[cols].rspancnt > 0){
-                        colData.push(<td key={k++} rowSpan= {row[cols].rspancnt}> {row[cols].key} </td>) 
+                        colData.push(<td key={k++} style={{"borderLeft":"1px"}} 
+                                        rowSpan= {row[cols].rspancnt}> {row[cols].key} </td>) 
                         row[cols].rspancnt = 0
                     }   
                 }

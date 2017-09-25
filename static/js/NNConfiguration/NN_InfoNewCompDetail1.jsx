@@ -15,7 +15,20 @@ import 'react-tabs/style/react-tabs.scss';
 
 import { downloadFile } from 'download-url-file';
 
-
+import Help_resnet from './../help/Help_resnet';
+import Help_autoencoder_csv from './../help/Help_autoencoder_csv';
+import Help_autoencoder_img from './../help/Help_autoencoder_img';
+import Help_bilstmcrf_iob from './../help/Help_bilstmcrf_iob';
+import Help_cnn from './../help/Help_cnn';
+import Help_doc2vec from './../help/Help_doc2vec';
+import Help_fasttext_txt from './../help/Help_fasttext_txt';
+import Help_seq2seq from './../help/Help_seq2seq';
+import Help_seq2seq_csv from './../help/Help_seq2seq_csv';
+import Help_wcnn from './../help/Help_wcnn';
+import Help_wdnn from './../help/Help_wdnn';
+import Help_wdnn_keras from './../help/Help_wdnn_keras';
+import Help_word2vec from './../help/Help_word2vec';
+import Help_word2vec_frame from './../help/Help_word2vec_frame';
 
 export default class NN_InfoNewCompDetail1 extends React.Component {
     constructor(props, context) {
@@ -73,6 +86,7 @@ export default class NN_InfoNewCompDetail1 extends React.Component {
 
     //Network List가 선택 되면 해당 Config를 조회해준다.
     handleChangeRadio(selectedValue){
+        this.state.isViewImage = false
         let netSelectTable = this.refs.master2
         let value = selectedValue.target.value //radio button cell
         if(value == undefined && selectedValue.target.attributes[0] != undefined){// key, desc cell
@@ -159,7 +173,7 @@ export default class NN_InfoNewCompDetail1 extends React.Component {
             let colDataSL = [];
             let row = nnInfoNewList[rows]
 
-            if(this.props.tabIndex == 1){
+            if(this.props.tabIndex == 10){
                 colDataSL.push(<td key={k++} > < input type = "checkbox" name="rd1"
                                                                     value = {row["id"]}
                                                                     onClick={this.handleChangeRadio.bind(this)} 
@@ -190,6 +204,39 @@ export default class NN_InfoNewCompDetail1 extends React.Component {
         nnInfoNewListTable.push(<thead ref='thead' key={k++} className="center">{tableHeaderSL}</thead>)
         nnInfoNewListTable.push(<tbody ref='tbody' key={k++} className="center" >{tableDataSL}</tbody>)
 
+        let helpData = []
+        let width = 800
+        // helpData.push(<img key={k++} src = {this.state.isViewImageDetail} style={{"width":"800"}} />)
+        if(this.state.netType == "resnet"){
+            helpData.push(<Help_resnet key={k++} width={width} />)
+        }else if(this.state.netType == "autoencoder_csv"){
+            helpData.push(<Help_autoencoder_csv key={k++} width={width} />)
+        }else if(this.state.netType == "autoencoder_img"){
+            helpData.push(<Help_autoencoder_img key={k++} width={width} />)
+        }else if(this.state.netType == "bilstmcrf_iob"){
+            helpData.push(<Help_bilstmcrf_iob key={k++} width={width} />)
+        }else if(this.state.netType == "cnn"){
+            helpData.push(<Help_cnn key={k++} width={width} />)
+        }else if(this.state.netType == "doc2vec"){
+            helpData.push(<Help_doc2vec key={k++} width={width} />)
+        }else if(this.state.netType == "fasttext_txt"){
+            helpData.push(<Help_fasttext_txt key={k++} width={width} />)
+        }else if(this.state.netType == "seq2seq"){
+            helpData.push(<Help_seq2seq key={k++} width={width} />)
+        }else if(this.state.netType == "seq2seq_csv"){
+            helpData.push(<Help_seq2seq_csv key={k++} width={width} />)
+        }else if(this.state.netType == "wcnn"){
+            helpData.push(<Help_wcnn key={k++} width={width} />)
+        }else if(this.state.netType == "wdnn"){
+            helpData.push(<Help_wdnn key={k++} width={width} />)
+        }else if(this.state.netType == "wdnn_keras"){
+            helpData.push(<Help_wdnn_keras key={k++} width={width} />)
+        }else if(this.state.netType == "word2vec"){
+            helpData.push(<Help_word2vec key={k++} width={width} />)
+        }else if(this.state.netType == "word2vec_frame"){
+            helpData.push(<Help_word2vec_frame key={k++} width={width} />)
+        }
+
 
         return (
             <section>
@@ -203,7 +250,7 @@ export default class NN_InfoNewCompDetail1 extends React.Component {
                         <div>
                         <table className="table detail" ref= 'master2_1' >
                         <tr><td style={{"textAlign":"center"}}>
-                            <img src = {this.state.isViewImageDetail} style={{"width":"800"}} />
+                            {helpData}
                         </td></tr>
                         </table>
                         </div>

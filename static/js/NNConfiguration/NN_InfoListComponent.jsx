@@ -5,7 +5,6 @@ import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 import ReportRepository from './../repositories/ReportRepository'
 
 
-
 export default class NN_InfoListComponent extends React.Component {
     constructor(props, context) {
         super(props);
@@ -26,7 +25,8 @@ export default class NN_InfoListComponent extends React.Component {
             selModalView: null,
             NN_ID : null,
             nextpageInit:"init",
-            nn_color:"#14c0f2"
+            nn_color:"#14c0f2",
+            NN_TableAPI:null
         };
     }
 
@@ -239,14 +239,15 @@ export default class NN_InfoListComponent extends React.Component {
             
             colData.push(<td key={k++} alt = {row["nn_id"]} > {row["biz_cate"]} </td>) 
             colData.push(<td key={k++} alt = {row["nn_id"]} > {row["biz_sub_cate"]} </td>) 
-            colData.push(<td key={k++} alt = {row["nn_id"]} > {row["nn_title"]} </td>) 
+            colData.push(<td key={k++} alt = {row["nn_id"]} > {row["nn_title"]}  </td>) 
             colData.push(<td key={k++} alt = {row["nn_id"]} > {row["nn_desc"]} </td>) 
 
 
 
             colData.push(<td key={k++} alt = {row["nn_id"]} > {row["dir"]} </td>) 
-            colData.push(<td key={k++} alt = {row["nn_id"]} style ={{"color":this.state.nn_color, "cursor":"pointer", "fontWeight":"bold"}}
-                                                            onClick={() => this.handleClick(row) } > {row["nn_id"]} </td>) 
+            colData.push(<td key={k++} alt = {row["nn_id"]} 
+                                style ={{"color":this.state.nn_color, "cursor":"pointer", "fontWeight":"bold"}}
+                                onClick={() => this.handleClick(row) } > {row["nn_id"]} </td>) 
             colData.push(<td key={k++} alt = {row["nn_id"]} > {row["nn_wf_ver_id"]} </td>)
 
             tableData.push(<tr key={k++}>{colData}</tr>)

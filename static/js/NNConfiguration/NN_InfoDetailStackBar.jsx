@@ -32,7 +32,7 @@ export default class NN_InfoDetailStackBar extends React.Component {
             trueColor:"#14c0f2",
             falseColor:"#ff8022",
             pieMainColor:"#14c0f2",
-            pieSubColor:["#ff8022","#ffcf3b","#47de8a","#999966","#33cccc","#ff66ff","#F85F73"] 
+            pieSubColor:["#ff4622","#ff8022","#ffab27","#ffcd21","#ffed87","#ff66ff","#F85F73"] 
         };
     }
     /////////////////////////////////////////////////////////////////////////////////////////

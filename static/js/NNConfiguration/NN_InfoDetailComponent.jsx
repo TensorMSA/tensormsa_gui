@@ -5,7 +5,9 @@ import FileUploadComponent from './../NNLayout/common/FileUploadComponent'
 import JsonConfComponent from './../NNLayout/common/JsonConfComponent'
 import NN_InfoDetailStackBar from './../NNConfiguration/NN_InfoDetailStackBar'
 import NN_InfoDetailLine from './../NNConfiguration/NN_InfoDetailLine'
+import NN_InfoDetailBarLine from './../NNConfiguration/NN_InfoDetailBarLine'
 import NN_InfoDetailMemoModal from './../NNConfiguration/NN_InfoDetailMemoModal';
+import NN_InfoDetailPredictAPIModal from './../NNConfiguration/NN_InfoDetailPredictAPIModal';
 import { Line, LineChart, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import {Pie} from 'react-chartjs-2';
 import Modal from 'react-modal';
@@ -18,22 +20,25 @@ export default class NN_InfoDetailComponent extends React.Component {
         this.state = {
             tableData: null,
             NN_TableWFData: null,
+            NN_TableWFDataAccLoss: null,
             NN_TableNodeData: null,
             NN_TableNodeDataSort: null,
-            NN_TableColArr1:[    {index:0,      id:"sel",               name:"Sel"}
-                                ,{index:1,      id:"nn_wf_ver_id",      name:"Network Version"}
-                                ,{index:2,      id:"active_flag",       name:"Active"}
-                                ,{index:3,      id:"train_batch_ver_id",name:"Train Batch"}
-                                ,{index:4,      id:"train_acc_info",    name:"Train Batch Acc"}
-                                ,{index:5,      id:"train_loss_info",   name:"Train Batch Loss"}
-                                ,{index:6,      id:"train_model_exists",name:"Train Model"}
-                                ,{index:7,      id:"pred_batch_ver_id", name:"Predict Batch"}
-                                ,{index:8,      id:"pred_acc_info",     name:"Predict Batch Acc"}
-                                ,{index:9,      id:"pred_loss_info",    name:"Predict Batch Loss"}
-                                ,{index:10,     id:"pred_model_exists", name:"Predict Model"}
-                                ,{index:11,     id:"batch"            , name:"Batch"}
-                                ,{index:12,     id:"nn_wf_ver_desc"   , name:"Memo"}
-                                ,{index:13,     id:"train", name:"Train"}
+            NN_TableColArr1:[    {index:0,      id:"sel"                , name:"Sel"}
+                                ,{index:1,      id:"nn_wf_ver_id"       , name:"Network Version"}
+                                ,{index:2,      id:"active_flag"        , name:"Active"}
+                                ,{index:3,      id:"train_batch_ver_id" , name:"Train Batch"}
+                                ,{index:4,      id:"train_acc_info"     , name:"Train Batch Acc"}
+                                ,{index:5,      id:"train_loss_info"    , name:"Train Batch Loss"}
+                                ,{index:6,      id:"train_model_exists" , name:"Train Model"}
+                                ,{index:7,      id:"pred_batch_ver_id"  , name:"Predict Batch"}
+                                ,{index:8,      id:"pred_acc_info"      , name:"Predict Batch Acc"}
+                                ,{index:9,      id:"pred_loss_info"     , name:"Predict Batch Loss"}
+                                ,{index:10,     id:"pred_model_exists"  , name:"Predict Model"}
+                                ,{index:11,     id:"batch"              , name:"Batch"}
+                                ,{index:12,     id:"nn_wf_ver_desc"     , name:"Memo"}
+                                ,{index:13,     id:"train"              , name:"Train"}
+                                ,{index:13,     id:"api"                , name:"API"}
+                                ,{index:14,     id:"condition"          , name:"Status"}
                             ],
             NN_TableBTData: null,
             NN_TableColArr2:[    {index:0,      id:"nn_batch_ver_id",   name:"Batch Version"}
@@ -65,11 +70,14 @@ export default class NN_InfoDetailComponent extends React.Component {
             pBarChartBTData:null,
             modalViewMenu : null,
             openModalFlag : false,
+            modalViewMenuPredictAPI : null,
+            openModalFlagPredictAPI : false,
             tabIndex : 1,
             file_wf_ver_id : 'common',
             active_color : "#14c0f2"
         };
         this.closeModal = this.closeModal.bind(this);
+        this.closeModalPredictAPI = this.closeModalPredictAPI.bind(this);
     }
     /////////////////////////////////////////////////////////////////////////////////////////
     // Common Function
@@ -287,6 +295,7 @@ export default class NN_InfoDetailComponent extends React.Component {
         for(let i in this.state.NN_TableWFData){
             if(value == this.state.NN_TableWFData[i]["nn_wf_ver_id"]){
                 this.state.nn_batch_id = this.state.NN_TableWFData[i]["train_batch_ver_id"]
+                this.state.NN_TableWFDataAccLoss = this.state.NN_TableWFData[i]
             }
             
         }
@@ -337,6 +346,10 @@ export default class NN_InfoDetailComponent extends React.Component {
         this.setState({openModalFlag: false})
     }
 
+    closeModalPredictAPI() { 
+        this.setState({openModalFlagPredictAPI: false})
+    }
+
     clickOpenModalMenu(selectedValue){
         let value = selectedValue
         if(value.target != undefined){
@@ -345,6 +358,19 @@ export default class NN_InfoDetailComponent extends React.Component {
                                                                 nn_id={this.state.nn_id}
                                                                 nn_wf_ver_id={value}/>})
             this.setState({openModalFlag: true})
+        }
+        
+    }
+
+    clickOpenModalPredictAPI(selectedValue){
+        let value = selectedValue
+        if(value.target != undefined){
+            value = selectedValue.target.attributes.alt.value
+            this.setState({modalViewMenuPredictAPI : <NN_InfoDetailPredictAPIModal closeModalPredictAPI={this.closeModalPredictAPI} 
+                                                                nn_id={this.state.nn_id}
+                                                                nn_wf_ver_id={value}
+                                                                nn_net_type={this.state.netType}/>})
+            this.setState({openModalFlagPredictAPI: true})
         }
         
     }
@@ -524,24 +550,40 @@ export default class NN_InfoDetailComponent extends React.Component {
             let trainloss = ""
             let predacc = ""
             let predloss = ""
+            let status = ""
+            let statusName = ""
 
             if(row["train_acc_info"] != null){
-                trainacc = row["train_acc_info"].acc
+                trainacc = row["train_acc_info"].acc[row["train_acc_info"].acc.length-1]
             }
             if(row["train_loss_info"] != null){
-                trainloss = row["train_loss_info"].loss
+                trainloss = row["train_loss_info"].loss[row["train_loss_info"].loss.length-1]
             }
             if(row["pred_acc_info"] != null){
-                predacc = row["pred_acc_info"].acc
+                predacc = row["pred_acc_info"].acc[row["pred_acc_info"].acc.length-1]
             }
             if(row["pred_loss_info"] != null){
-                predloss = row["pred_loss_info"].loss
+                predloss = row["pred_loss_info"].loss[row["pred_loss_info"].loss.length-1]
             }
 
             if(row["active_flag"] == "Y"){
                 this.state.color = this.state.active_color
             }else{
                 this.state.color = "black"
+            }
+
+            if(row["condition"] == "1"){
+                status = "state_alive"
+                statusName = "Alive"
+            }else if(row["condition"] == "2"){
+                status = "state_action"
+                statusName = "Action"
+            }else if(row["condition"] == "3"){
+                status = "state_close"
+                statusName = "Close"
+            }else{
+                status = "state_error"
+                statusName = "Error"
             }
 
             colData.push(<td key={k++} width="50" > < input type = "radio" name="rd1"
@@ -588,15 +630,22 @@ export default class NN_InfoDetailComponent extends React.Component {
                                                 onClick={this.clickOpenModalMenu.bind(this)} 
                                                 src={memoImg} /></td>)
             colData.push(<td key={k++} width="50" > <button name="btn2"
-                                                                    alt = {row["nn_wf_ver_id"]} 
-                                                                    value = {"Train"}
-                                                                    onClick = {this.clickTrainVersion.bind(this)}
-                                                                    style={{"textAlign":"center", "width":"100%"}} >Train</button></td>)
+                                                            alt = {row["nn_wf_ver_id"]} 
+                                                            value = {"Train"}
+                                                            onClick = {this.clickTrainVersion.bind(this)}
+                                                            style={{"textAlign":"center", "width":"100%"}} >Train</button></td>)
+            colData.push(<td key={k++} width="50" > <button name="btn3"
+                                                            alt = {row["nn_wf_ver_id"]} 
+                                                            value = {"Predict"}
+                                                            onClick = {this.clickOpenModalPredictAPI.bind(this)}
+                                                            style={{"textAlign":"center", "width":"100%"}} >Predict</button></td>)
             // colData.push(<td key={k++} width="50" > < input type = "button" name="btn2"
             //                                                         alt = {row["nn_wf_ver_id"]} 
             //                                                         value = {"Train"}
             //                                                         onClick = {this.clickTrainVersion.bind(this)}
             //                                                         style={{"textAlign":"center", "width":"100%"}} /></td>)
+            colData.push(<td key={k++} style={{"padding":"5px 20px"}} className={status}  ><span  alt = {row["nn_wf_ver_id"]} 
+                                        onClick = {this.clickSeletVersion.bind(this)} /> {statusName} </td>)
             tableData.push(<tr key={k++}>{colData}</tr>)
         }
 
@@ -617,10 +666,10 @@ export default class NN_InfoDetailComponent extends React.Component {
             let loss = ""
             
             if(row["acc_info"] != null){
-                acc = row["acc_info"].acc
+                acc = row["acc_info"].acc[row["acc_info"].acc.length-1]
             }
             if(row["loss_info"] != null){
-                loss = row["loss_info"].loss
+                loss = row["loss_info"].loss[row["loss_info"].loss.length-1]
             }
 
             if(row["eval_flag"] == "Y" || row["active_flag"] == "Y"){
@@ -758,6 +807,14 @@ export default class NN_InfoDetailComponent extends React.Component {
                         </div>
                     </Modal>    
 
+                    <Modal className="modal" overlayClassName="modal" isOpen={this.state.openModalFlagPredictAPI}
+                            onRequestClose={this.closeModalPredictAPI}
+                            contentLabel="Modal" >
+                        <div className="modal-dialog modal-lg">
+                          {this.state.modalViewMenuPredictAPI}
+                        </div>
+                    </Modal>   
+
                 {this.state.isViewBatch ?
                     <div>
                     <br style={{ "height":20}}></br>
@@ -772,13 +829,33 @@ export default class NN_InfoDetailComponent extends React.Component {
                 }
 
                 <div>
-                    <NN_InfoDetailLine ref="line" NN_Data={this.state.lineAutoChart} />
+                    <h2>Auto ML chart</h2>
+                    <NN_InfoDetailBarLine ref="barline" NN_Data={this.state.lineAutoChart} />
                 </div>
 
-                <div>
-                    <h2> Train Model Accuracy chart ({this.state.nn_batch_id})</h2>
-                    <NN_InfoDetailStackBar ref="stackbar" NN_Data={this.state.tBarChartBTData} />
-                </div>
+                <Tabs defaultIndex={0}  onSelect={tabIndex => this.networkSelectTab({ tabIndex })} >
+                    <TabList>
+                      <Tab>Classification</Tab>
+                      <Tab>Acc&Loss</Tab>
+                    </TabList>
+
+                    <TabPanel>
+                        <div>
+                            <h2> Label Classification chart ({this.state.nn_batch_id})</h2>
+                            <NN_InfoDetailStackBar ref="stackbar" NN_Data={this.state.tBarChartBTData} />
+                        </div>
+                    </TabPanel>
+                    <TabPanel>
+                        <div>
+                            <h2> Train Model Acc&Loss chart ({this.state.nn_batch_id})</h2>
+                            <NN_InfoDetailLine ref="line" NN_Data={this.state.NN_TableWFDataAccLoss} />
+                        </div>
+
+                    </TabPanel> 
+                </Tabs>
+                
+
+                
 
                 <div>
                     <table className="partition_half">

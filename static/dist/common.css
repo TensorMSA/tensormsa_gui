@@ -86,11 +86,11 @@ table.chart td:last-child{border-right:1px solid #dcdcdc;}
 .color2{color:#009cff !important;}
 
 .state_standby{display:inline-block;padding:0 0 1px 20px;color:#00a930;background:url(../images/ic_state_standby.png) no-repeat 0 0;}
-.state_action{display:inline-block;padding:0 0 1px 20px;color:#079fff;background:url(../images/ic_state_action.png) no-repeat 0 2px;}
-.state_close{display:inline-block;padding:0 0 1px 20px;color:#079fff;background:url(../images/ic_state_close.png) no-repeat 0 1px;}
-.state_error{display:inline-block;padding:0 0 1px 20px;color:#ff3333;background:url(../images/ic_state_error.png) no-repeat 0 2px;}
-.state_alive{display:inline-block;padding:0 0 1px 20px;color:#079fff;background:url(../images/ic_state_alive.png) no-repeat 0 2px;}
-.state_dead{display:inline-block;padding:0 0 1px 20px;color:#6a7277;background:url(../images/ic_state_dead.png) no-repeat 0 2px;}
+.state_action{display:inline-block;padding:0 0 1px 20px;color:#079fff;background:url(../images/ic_state_action.png) no-repeat 0 5px;}
+.state_close{display:inline-block;padding:0 0 1px 20px;color:#079fff;background:url(../images/ic_state_close.png) no-repeat 0 5px;}
+.state_error{display:inline-block;padding:0 0 1px 20px;color:#ff3333;background:url(../images/ic_state_error.png) no-repeat 0 5px;}
+.state_alive{display:inline-block;padding:0 0 1px 20px;color:#079fff;background:url(../images/ic_state_alive.png) no-repeat 0 5px;}
+.state_dead{display:inline-block;padding:0 0 1px 20px;color:#6a7277;background:url(../images/ic_state_dead.png) no-repeat 0 5px;}
 .state_y{display:inline-block;width:16px;height:16px;text-indent:-9999px;background:url(../images/ic_state_y.png) no-repeat 0 0;}
 .state_n{display:inline-block;width:16px;height:16px;text-indent:-9999px;background:url(../images/ic_state_n.png) no-repeat 0 0;}
 
