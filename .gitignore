@@ -2,9 +2,7 @@
 /static/node_modules/
 /templates/npm-debug.log
 npm-debug.log
-/static/js/constants/EnvConstants.js
-/static/dist/NetConf.js
-/static/dist/NetConf.js.map
-/static/dist/TensorMSA.js
-/static/dist/TensorMSA.js.map
-/static/js/constants/EnvConstants.js
+#/static/js/constants/EnvConstants.js
+./static/dist/TensorMSA.js
+./static/dist/TensorMSA.js.map
+./static/js/constants/EnvConstants.js
