@@ -77,7 +77,7 @@ export default class NN_InfoDetailAutomlTable extends React.Component {
         for(let rows in lineData['best']){
           let colData = [];
           let row = lineData['best'][rows]
-          colData.push(<td key={k++} > {row["generation"]} </td>)
+          colData.push(<td key={k++} > {row["generation"]*1+1} </td>)
           colData.push(<td key={k++} > {row["nn_wf_ver_id"]} </td>)
           colData.push(<td key={k++} > {row["acc"]} </td>)
           if(row["survive"] == true){
