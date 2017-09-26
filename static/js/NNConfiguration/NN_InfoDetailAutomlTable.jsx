@@ -98,14 +98,14 @@ export default class NN_InfoDetailAutomlTable extends React.Component {
         ////////////////////////////////////////////////////////////////////////////////////////
         let tableGHeader = makeHeader(this.state.NN_TableColArr2)
 
-        let depth = 0
+        let depth = 1
         let tableGData = []; // make tabledata
         for(let rows in lineData['bygen']){
           let row = lineData['bygen'][rows]
           for(let col in row){
             let colData = [];
             colData.push(<td key={k++} > {depth} </td>)
-            colData.push(<td key={k++} > {row[col]["generation"]} </td>)
+            colData.push(<td key={k++} > {row[col]["generation"]*1+1} </td>)
             colData.push(<td key={k++} > {row[col]["nn_wf_ver_id"]} </td>)
             colData.push(<td key={k++} > {row[col]["acc"]} </td>)
             if(row[col]["survive"] == true){
@@ -118,6 +118,13 @@ export default class NN_InfoDetailAutomlTable extends React.Component {
             tableGData.push(<tr key={k++}>{colData}</tr>)
             
           }
+          let blankData = []
+          blankData.push(<td key={k++} style={{"backgroundColor":"#f1f1f1"}} >  </td>)
+          blankData.push(<td key={k++} style={{"backgroundColor":"#f1f1f1"}} >  </td>)
+          blankData.push(<td key={k++} style={{"backgroundColor":"#f1f1f1"}} >  </td>)
+          blankData.push(<td key={k++} style={{"backgroundColor":"#f1f1f1"}} >  </td>)
+          blankData.push(<td key={k++} style={{"backgroundColor":"#f1f1f1"}} >  </td>)
+          tableGData.push(<tr key={k++}>{blankData}</tr>)
           depth += 1
           
         }
