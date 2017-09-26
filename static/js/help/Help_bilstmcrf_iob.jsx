@@ -18,14 +18,19 @@ export default class Help_bilstmcrf_iob extends React.Component {
     }
 
     render() {
-
+let url1 = "./images/help_bilstm1.png"
         return (  
 
             <div>
                 <h1> Bilstmcrf Iob </h1>
                 
                 <div className="container tabBody">
-        
+        <img src={url1} />
+                <br />
+                <br />
+                <h3>
+                
+                </h3>
                 </div>
             </div>
         )

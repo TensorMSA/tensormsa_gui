@@ -8,6 +8,7 @@ import NN_InfoDetailLine from './../NNConfiguration/NN_InfoDetailLine'
 import NN_InfoDetailBarLine from './../NNConfiguration/NN_InfoDetailBarLine'
 import NN_InfoDetailMemoModal from './../NNConfiguration/NN_InfoDetailMemoModal';
 import NN_InfoDetailPredictAPIModal from './../NNConfiguration/NN_InfoDetailPredictAPIModal';
+import NN_InfoDetailAutomlTable from './../NNConfiguration/NN_InfoDetailAutomlTable'
 import { Line, LineChart, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import {Pie} from 'react-chartjs-2';
 import Modal from 'react-modal';
@@ -73,6 +74,7 @@ export default class NN_InfoDetailComponent extends React.Component {
             modalViewMenuPredictAPI : null,
             openModalFlagPredictAPI : false,
             tabIndex : 1,
+            tabIndexAT : 1,
             file_wf_ver_id : 'common',
             active_color : "#14c0f2"
         };
@@ -492,6 +494,12 @@ export default class NN_InfoDetailComponent extends React.Component {
         this.setState({ tabIndex: value })
     }
 
+    networkSelectTabAT(value){
+        // let tab = value.target.innerText
+        value = value.tabIndexAT + 1
+        this.setState({ tabIndexAT: value })
+    }
+
     render() {
         let batchImg = "./images/ico_menu05.png"
         let memoImg = "./images/ico_menu06.png"
@@ -791,7 +799,7 @@ export default class NN_InfoDetailComponent extends React.Component {
 
                 <h1> {this.state.nn_title} </h1>    
                 <table style={{ "width":"100%" }} ><tr><td>
-                <div style={{ "overflow":"auto", "height":150}}>      
+                <div style={{ "overflow":"auto", "height":160}}>      
                     <table className="table detail" ref= 'master2'  >
                     
                         {wfInfoListTable}
@@ -828,10 +836,26 @@ export default class NN_InfoDetailComponent extends React.Component {
                     </div>
                 }
 
-                <div>
-                    <h2>Auto ML chart</h2>
-                    <NN_InfoDetailBarLine ref="barline" NN_Data={this.state.lineAutoChart} />
-                </div>
+                <Tabs defaultIndex={0}  onSelect={tabIndexAT => this.networkSelectTabAT({ tabIndexAT })} >
+                    <TabList>
+                      <Tab>AutoMLChart</Tab>
+                      <Tab>AutoMLTable</Tab>
+                    </TabList>
+
+                    <TabPanel>
+                        <div>
+                            <h2>Auto ML chart</h2>
+                            <NN_InfoDetailBarLine ref="barline" NN_Data={this.state.lineAutoChart} />
+                        </div>
+                    </TabPanel>
+                    <TabPanel>
+                        <div>
+                            <NN_InfoDetailAutomlTable ref="automlTable" NN_Data={this.state.lineAutoChart} />
+                        </div>
+                    </TabPanel>
+                </Tabs>
+
+                
 
                 <Tabs defaultIndex={0}  onSelect={tabIndex => this.networkSelectTab({ tabIndex })} >
                     <TabList>

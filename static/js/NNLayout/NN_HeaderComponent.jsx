@@ -59,8 +59,16 @@ export default class NN_HeaderComponent extends React.Component {
 						msg.show("학습이 완료되지 않았습니다.")
 					}
 				}
-            case 7:
-            	return this.props.getHeaderEvent(7);
+			case 7:
+            	if(this.context.NN_CONFIG && this.context.NN_TYPE != 'cifar'){
+	                return this.props.getHeaderEvent(7); 
+            	} else {
+					if (!this.context.NN_CONFIG) {
+						msg.show("설정이 완료되지 않았습니다.")
+					}
+				}
+            case 8:
+            	return this.props.getHeaderEvent(8);
         }
     }
 
@@ -109,10 +117,10 @@ export default class NN_HeaderComponent extends React.Component {
 					<h1 className="hidden">Navigator</h1>
 					<ul>
 						<li className={this.isActive(1)}><a href="#" onClick={this.setFilter.bind(this, 1)}>Net Info</a></li>
-						<li className={this.isActive(2)}><a href="#" onClick={this.setFilter.bind(this, 2)}>Net Detail</a></li>
 						<li className={this.isActive(4)}><a href="#" onClick={this.setFilter.bind(this, 4)}>Net Create</a></li>  
 						<li className={this.isActive(5)}><a href="#" onClick={this.setFilter.bind(this, 5)}>Monitoring</a></li>
 						<li className={this.isActive(7)}><a href="#" onClick={this.setFilter.bind(this, 7)}>App List</a></li>
+						<li className={this.isActive(2)}><a href="#" onClick={this.setFilter.bind(this, 2)}>Settings</a></li>
 					</ul>
 				</nav>
 					<dl className="utilMenu">
