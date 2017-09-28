@@ -10,6 +10,7 @@ export default class FileUploadComponent extends React.Component {
         super(props)
         this.state = {
             fileData:null,
+            fileDataPre:null,
             nn_id:null,
             nn_wf_ver_id:null,
             nn_node_name:null,
@@ -33,7 +34,10 @@ export default class FileUploadComponent extends React.Component {
     }
     
     componentDidMount() {
-    
+        this.state.nn_id = this.props.nn_id
+            this.state.nn_wf_ver_id = this.props.nn_wf_ver_id
+            this.state.nn_node_name = this.props.nn_node_name
+            this.getFileData()
     }
 
     _handleUploading(progress, mill){
@@ -70,24 +74,28 @@ export default class FileUploadComponent extends React.Component {
         let k = 1
         let listFile = []
 
-        if(this.props.nn_id != null && this.props.nn_wf_ver_id != null && this.props.nn_node_name != null){
-          this.fileOption.baseUrl = EnvConstants.getApiServerUrl()+this.state.fileurl
-          this.fileOption.baseUrl += this.props.nn_id+'/ver/'+this.props.nn_wf_ver_id+'/dir/'+this.props.nn_node_name+'/type/'+this.props.nn_path_type+'/'
-          if(this.state.nn_id != this.props.nn_id || 
-            this.state.nn_wf_ver_id != this.props.nn_wf_ver_id || 
-            this.state.nn_node_name != this.props.nn_node_name){
-              this.state.nn_id = this.props.nn_id
-              this.state.nn_wf_ver_id = this.props.nn_wf_ver_id
-              this.state.nn_node_name = this.props.nn_node_name
-              this.getFileData()
-          }
-        }
+        // if(this.props.nn_id != null && this.props.nn_wf_ver_id != null && this.props.nn_node_name != null){
+        //   this.fileOption.baseUrl = EnvConstants.getApiServerUrl()+this.state.fileurl
+        //   this.fileOption.baseUrl += this.props.nn_id+'/ver/'+this.props.nn_wf_ver_id+'/dir/'+this.props.nn_node_name+'/type/'+this.props.nn_path_type+'/'
+        //   if(this.state.nn_id != this.props.nn_id || 
+        //     this.state.nn_wf_ver_id != this.props.nn_wf_ver_id || 
+        //     this.state.nn_node_name != this.props.nn_node_name){
+        //       this.state.nn_id = this.props.nn_id
+        //       this.state.nn_wf_ver_id = this.props.nn_wf_ver_id
+        //       this.state.nn_node_name = this.props.nn_node_name
+        //       this.getFileData()
+        //   }
+        // }
 
-        
+        // if (this.state.fileData == null || this.state.fileData != this.state.fileDataPre) {
+        //     this.state.nn_id = this.props.nn_id
+        //     this.state.nn_wf_ver_id = this.props.nn_wf_ver_id
+        //     this.state.nn_node_name = this.props.nn_node_name
+        //     this.getFileData()
+        // }
 
-        if (this.state.fileData != null) {
-            listFile = this.state.fileData
-        }
+        this.state.fileDataPre = this.state.fileData
+        listFile = this.state.fileData
 
         //File upload Header
         let tableHeader = []; //make header
@@ -134,7 +142,7 @@ export default class FileUploadComponent extends React.Component {
 //"float":"left",
         return (
             <div>
-                <h2 style={{"margin-right":"5px","verticalAlign":"top"}}>{this.props.title}</h2>
+                <h2 style={{"marginRight":"5px","verticalAlign":"top"}}>{this.props.title}</h2>
               {this.props.uploadbtnflag ?
                 <div>
         

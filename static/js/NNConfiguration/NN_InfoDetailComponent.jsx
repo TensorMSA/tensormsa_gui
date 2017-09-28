@@ -35,9 +35,8 @@ export default class NN_InfoDetailComponent extends React.Component {
                                 ,{index:8,      id:"pred_acc_info"      , name:"Predict Batch Acc"}
                                 ,{index:9,      id:"pred_loss_info"     , name:"Predict Batch Loss"}
                                 ,{index:10,     id:"pred_model_exists"  , name:"Predict Model"}
-                                ,{index:11,     id:"batch"              , name:"Batch"}
-                                ,{index:12,     id:"nn_wf_ver_desc"     , name:"Memo"}
-                                ,{index:13,     id:"train"              , name:"Train"}
+                                ,{index:11,     id:"nn_wf_ver_desc"     , name:"Memo"}
+                                ,{index:12,     id:"train"              , name:"Train"}
                                 ,{index:13,     id:"api"                , name:"API"}
                                 ,{index:14,     id:"condition"          , name:"Status"}
                             ],
@@ -59,7 +58,6 @@ export default class NN_InfoDetailComponent extends React.Component {
             train_node_name:null,
             eval_node_name:null,
             nn_title:null,
-            nn_titlebt:"Network Batch List ",
             nodeType:null,
             netType:null,
             isViewBatch:false,
@@ -76,7 +74,9 @@ export default class NN_InfoDetailComponent extends React.Component {
             tabIndex : 1,
             tabIndexAT : 1,
             file_wf_ver_id : 'common',
-            active_color : "#14c0f2"
+            active_color : "#14c0f2",
+            configEditFlag:"N",
+            trainType:true // true : auto, false : single
         };
         this.closeModal = this.closeModal.bind(this);
         this.closeModalPredictAPI = this.closeModalPredictAPI.bind(this);
@@ -117,28 +117,38 @@ export default class NN_InfoDetailComponent extends React.Component {
     addVersion(){//Version New를 생성해준다.
         let re = confirm( "Are you create version?" )
         if(re == true){
-            // // WF 신규 생성 Make NN WF Info
-            // let wfparam = {}
-            // wfparam["nn_def_list_info_nn_id"] = ""
-            // wfparam["nn_wf_ver_info"] = "init"
-            // wfparam["condition"] = "1"
-            // wfparam["active_flag"] = "N"
-
-            // // Make NN WF Node Info
-            // let nodeparam = {}
-            // nodeparam["type"] = this.state.netType
-
-            // this.props.reportRepository.postCommonNNInfoWF(this.state.nn_id, wfparam).then((wf_ver_id) => {
-            //     // Make NN WF Node Info
-            //     this.props.reportRepository.postCommonNNInfoWFNode(this.state.nn_id, wf_ver_id, nodeparam).then((tableData) => {
-            //         this.getCommonNNInfoWF(this.state.nn_id)
-            //         });
-            // });
-
-            //Run AutoML
-            this.props.reportRepository.postCommonNNInfoAuto(this.state.nn_id).then((tableData) => {
             
-            });
+            if(this.state.trainType == true){
+                //Run AutoML
+                this.props.reportRepository.postCommonNNInfoAuto(this.state.nn_id).then((tableData) => {
+                
+                });
+            }else{
+                   // New Version Train
+                let wfparam = {}
+                wfparam["nn_def_list_info_nn_id"] = ""
+                wfparam["nn_wf_ver_info"] = "init"
+                wfparam["condition"] = "1"
+                wfparam["active_flag"] = "N"
+
+                // Make NN WF Node Info
+                let nodeparam = {}
+                nodeparam["type"] = this.state.netType
+
+                this.props.reportRepository.postCommonNNInfoWF(this.state.nn_id, wfparam).then((wf_ver_id) => {
+                    //node create
+                    this.props.reportRepository.postCommonNNInfoWFNode(this.state.nn_id, wf_ver_id, nodeparam).then((tableData) => {
+                        //node config input
+                        this.props.reportRepository.putCommonNNInfoWFNode(this.state.nn_id, wf_ver_id, '', nodeparam).then((tableData) => {
+
+                        });
+
+                    });
+                }); 
+            }
+
+            this.searchData()
+            
         }
     }
 
@@ -166,31 +176,38 @@ export default class NN_InfoDetailComponent extends React.Component {
                     });
                 }
             }
+
+            let wfparam = {}
             
-            //Batch Active, Eval Flag Save
-            let nn_id = this.state.nn_id
-            let nn_wf_ver_id = this.state.nn_wf_ver_id
-            vbody = this.refs.master3.children[1].children
-            for(let i=0 ; i < vbody.length; i++){
-                let col = vbody[i].children
-                let batch = col[this.findColInfo("2", "id", "nn_batch_ver_id").index].attributes.alt.value // version id key column
-                let evalb = col[this.findColInfo("2", "id", "eval_flag").index].childNodes[0].childNodes[0].selectedOptions[0].value // Eval column
-                let activeb = col[this.findColInfo("2", "id", "active_flag").index].childNodes[0].childNodes[0].selectedOptions[0].value // Active column
+            for(let i in this.state.NN_TableBTData){
+                wfparam["nn_batch_ver_id"] = this.state.NN_TableBTData[i]['nn_batch_ver_id']
+                wfparam["eval_flag"] = this.state.NN_TableBTData[i]['eval_flag']
+                wfparam["active_flag"] = this.state.NN_TableBTData[i]['active_flag']
 
-                let wfparam = {}
-                wfparam["nn_batch_ver_id"] = batch
-                wfparam["eval_flag"] = evalb
-                wfparam["active_flag"] = activeb
-                // Version Active 변경.
-
-                this.props.reportRepository.putCommonNNInfoBatch(this.state.nn_id, this.state.nn_wf_ver_id, wfparam).then((tableData) => {
-                });
-
+                if(this.state.NN_TableBTData[i]['eval_flag'] == "Y" || this.state.NN_TableBTData[i]['active_flag'] == "Y"){
+                    this.props.reportRepository.putCommonNNInfoBatch(this.state.nn_id, this.state.nn_wf_ver_id, wfparam).then((tableData) => {
+                    });
+                }
             }
-
+            
             //Config Save
             let params = this.refs.netconfig.getConfigData()
+            
+            this.props.reportRepository.putCommonNNInfoWFNode(this.state.nn_id, this.state.nn_wf_ver_id, this.state.nodeType, params).then((tableData) => {
+
+            });
+            
+
         }
+    }
+
+    searchData(){
+        this.getCommonNNInfoWF()
+        this.refs.trainfilesrc.getFileData()
+        this.refs.trainfilestr.getFileData()
+        this.refs.evalfilesrc.getFileData()
+        this.refs.evalfilestr.getFileData()
+
     }
     /////////////////////////////////////////////////////////////////////////////////////////
     // Search Function
@@ -206,6 +223,13 @@ export default class NN_InfoDetailComponent extends React.Component {
             this.props.reportRepository.getCommonNNInfo(this.state.nn_id).then((tableData) => {// Network Info
                 this.state.nn_title = tableData['fields'][0]["nn_title"]+" (Net ID : "+this.state.nn_id+")"
                 this.state.netType = tableData['fields'][0]["dir"]
+
+                let autokeys = Object.keys(tableData['fields'][0]["automl_parms"])
+                if(autokeys.length == 0){
+                    this.state.trainType = false
+                    this.state.configEditFlag = "Y"
+                }
+
                 //get node name
                 for(let i in tableData['graph']){
                     let nn_node = tableData['graph'][i]['fields']['graph_node']
@@ -245,7 +269,6 @@ export default class NN_InfoDetailComponent extends React.Component {
         }
 
         this.props.reportRepository.getCommonNNInfoBatch(this.state.nn_id, ver).then((tableData) => {// Network Batch Info
-            this.state.nn_titlebt = "Network Batch List"+" (Ver ID : "+ver+")"
             //Batch Sort ID를 만들어주어야 한다.nn000000001_1_1
             for(let i in tableData){
                 if(tableData[i]["nn_batch_ver_id"] != null){
@@ -272,6 +295,7 @@ export default class NN_InfoDetailComponent extends React.Component {
     getCommonNodeInfo(ver) {
         this.props.reportRepository.getCommonNNInfoWFNode(this.state.nn_id, ver, "all").then((tableData) => {// Network Node Info
             this.setState({ NN_TableNodeData: tableData })
+            this.clickNodeConfig("netconf_node")// Node Default netconf 를 뿌려 준다.
         });
     }
     /////////////////////////////////////////////////////////////////////////////////////////
@@ -291,6 +315,7 @@ export default class NN_InfoDetailComponent extends React.Component {
         this.state.NN_TableNodeDataSort = null
         this.getCommonBatchInfo(value)// Batch를 조회해준다.
         this.getCommonNodeInfo(value)// Node 정보를 가져와 뿌려준다.Active version의 Node를 가져온다.
+        
         this.setBatchBarChartData(value)//chart정보를 만들어 뿌려준다.
 
         //클릭된 Batch 번호를 가져와 Title표시를 해주주어야 한다.
@@ -309,7 +334,6 @@ export default class NN_InfoDetailComponent extends React.Component {
             value = selectedValue.target.attributes.alt.value   
         }
         this.clickChangeVersion(value)
-        this.state.isViewBatch = false
     }
 
     clickTrainVersion(selectedValue){//Version Train을 선택했을때 훈련을 하고 재 조회 해준다. ..
@@ -377,20 +401,6 @@ export default class NN_InfoDetailComponent extends React.Component {
         
     }
 
-    batchView(selectedValue){
-        let tfflage = this.state.isViewBatch
-        if(selectedValue.target.alt != this.state.nn_wf_ver_id){
-            tfflage = false
-        }
-        this.clickSeletVersion(selectedValue)
-
-        if(tfflage == false){
-            this.setState({ isViewBatch: true })
-        }
-
-
-    }
-
     /////////////////////////////////////////////////////////////////////////////////////////
     // Version Line Chart
     /////////////////////////////////////////////////////////////////////////////////////////
@@ -445,6 +455,9 @@ export default class NN_InfoDetailComponent extends React.Component {
                 let changvalue = table.rows[i].children[this.findColInfo("2", "id", "eval_flag").index].children[0].children[0]
                 if(key != changekey){// Y로 변경한 Cell 이 아니라면 
                     changvalue.value = "N"//N으로 변경을 해준다.
+                    this.state.NN_TableBTData[i-1]['eval_flag'] = "N"
+                }else{
+                    this.state.NN_TableBTData[i-1]['eval_flag'] = "Y"
                 }
             }
         }
@@ -460,6 +473,9 @@ export default class NN_InfoDetailComponent extends React.Component {
                 let changvalue = table.rows[i].children[this.findColInfo("2", "id", "active_flag").index].children[0].children[0]
                 if(key != changekey){// Y로 변경한 Cell 이 아니라면 
                     changvalue.value = "N"//N으로 변경을 해준다.
+                    this.state.NN_TableBTData[i-1]['active_flag'] = "N"
+                }else{
+                    this.state.NN_TableBTData[i-1]['active_flag'] = "Y"
                 }
             }
         }
@@ -472,9 +488,10 @@ export default class NN_InfoDetailComponent extends React.Component {
         let value = selectedValue
         if(value.target != undefined){
             value = selectedValue.target.attributes.alt.value
+        }else{
+            value = selectedValue
         }
 
-        console.log(value)
         this.state.nodeType = value
 
         let nodeData = this.state.NN_TableNodeData
@@ -631,9 +648,6 @@ export default class NN_InfoDetailComponent extends React.Component {
                                         onClick = {this.clickSeletVersion.bind(this)} > {predloss} </td>)
             colData.push(<td key={k++} alt = {row["nn_wf_ver_id"]} 
                                         onClick = {this.clickSeletVersion.bind(this)} > {row["train_model_exists"]} </td>)
-            colData.push(<td key={k++} > <img style ={{width:20, "cursor":"pointer"}} alt = {row["nn_wf_ver_id"]}
-                                                onClick={this.batchView.bind(this)} 
-                                                src={batchImg} /></td>)
             colData.push(<td key={k++} > <img style ={{width:20, "cursor":"pointer"}} alt = {row["nn_wf_ver_id"]}
                                                 onClick={this.clickOpenModalMenu.bind(this)} 
                                                 src={memoImg} /></td>)
@@ -792,54 +806,46 @@ export default class NN_InfoDetailComponent extends React.Component {
             <div className="container paddingT10">
                 
                 <div className="tblBtnArea">
+                    <button type="button" className="search" style={{"marginRight":"5px"}} onClick={() => this.searchData()} >Search</button>
                     <button type="button" className="addnew" style={{"marginRight":"5px"}} onClick={() => this.addVersion() } >Add Ver</button>
                     <button type="button" className="save" onClick={() => this.saveData()} >Save</button>
                 </div>
                 
-
                 <h1> {this.state.nn_title} </h1>    
-                <table style={{ "width":"100%" }} ><tr><td>
-                <div style={{ "overflow":"auto", "height":160}}>      
-                    <table className="table detail" ref= 'master2'  >
-                    
-                        {wfInfoListTable}
-                    
-                    </table>
-                </div>
-                </td></tr></table>
-                    <Modal className="modal" overlayClassName="modal" isOpen={this.state.openModalFlag}
-                            onRequestClose={this.closeModal}
-                            contentLabel="Modal" >
-                        <div className="modal-dialog modal-lg">
-                          {this.state.modalViewMenu}
+                <table style={{ "width":"100%" }} >
+                    <tr><td>
+                        <div style={{ "overflow":"auto", "height":160}}>      
+                            <table className="table detail" ref= 'master2'  >
+                                {wfInfoListTable}
+                            </table>
                         </div>
-                    </Modal>    
+                    </td></tr>
+                </table>
 
-                    <Modal className="modal" overlayClassName="modal" isOpen={this.state.openModalFlagPredictAPI}
-                            onRequestClose={this.closeModalPredictAPI}
-                            contentLabel="Modal" >
-                        <div className="modal-dialog modal-lg">
-                          {this.state.modalViewMenuPredictAPI}
-                        </div>
-                    </Modal>   
-
-                {this.state.isViewBatch ?
-                    <div>
-                    <br style={{ "height":20}}></br>
-                    <h1> {this.state.nn_titlebt} </h1>
-                    <table className="table detail" ref= 'master3' >
-                        {batchInfoListTable}
-                    </table>
+                <Modal className="modal" overlayClassName="modal" isOpen={this.state.openModalFlag}
+                        onRequestClose={this.closeModal}
+                        contentLabel="Modal" >
+                    <div className="modal-dialog modal-lg">
+                        {this.state.modalViewMenu}
                     </div>
-                    :
-                    <div>
-                    </div>
-                }
+                </Modal>    
 
+                <Modal className="modal" overlayClassName="modal" isOpen={this.state.openModalFlagPredictAPI}
+                        onRequestClose={this.closeModalPredictAPI}
+                        contentLabel="Modal" >
+                    <div className="modal-dialog modal-lg">
+                        {this.state.modalViewMenuPredictAPI}
+                    </div>
+                </Modal>   
+
+                <br/>
+                <br/>
+                {this.state.trainType ?
                 <Tabs defaultIndex={0}  onSelect={tabIndexAT => this.networkSelectTabAT({ tabIndexAT })} >
                     <TabList>
-                      <Tab>AutoMLChart</Tab>
-                      <Tab>AutoMLTable</Tab>
+                        <Tab>AutoMLChart</Tab>
+                        <Tab>AutoMLTable</Tab>
+                        <Tab>File</Tab>
                     </TabList>
 
                     <TabPanel>
@@ -853,103 +859,167 @@ export default class NN_InfoDetailComponent extends React.Component {
                             <NN_InfoDetailAutomlTable ref="automlTable" NN_Data={this.state.lineAutoChart} />
                         </div>
                     </TabPanel>
-                </Tabs>
+                    <TabPanel>
+                        <div>
+                            <table className="partition_half">
+                                <tr>
+                                    <td style={{"verticalAlign":"top"}}>
+                                        <FileUploadComponent ref="trainfilesrc" 
+                                                            title= "Network Train Source File Upload"
+                                                            nn_id={this.state.nn_id} 
+                                                            nn_wf_ver_id={this.state.file_wf_ver_id} 
+                                                            nn_node_name={this.state.train_node_name} 
+                                                            nn_path_type={"source"}
+                                                            uploadbtnflag={true} 
+                                                            deletebtnflag={true} />
+                                    </td>
 
-                
+                                    <td style={{"verticalAlign":"top"}}>
+                                        <FileUploadComponent ref="evalfilesrc" 
+                                                            title= "Network Eval Source File Upload"
+                                                            nn_id={this.state.nn_id} 
+                                                            nn_wf_ver_id={this.state.file_wf_ver_id} 
+                                                            nn_node_name={this.state.eval_node_name} 
+                                                            nn_path_type={"source"}
+                                                            uploadbtnflag={true} 
+                                                            deletebtnflag={true} />
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+
+                         <div>
+                             <table className="partition_half">
+                                <tr>
+                                    <td style={{"verticalAlign":"top"}}>
+                                        <FileUploadComponent ref="trainfilestr" 
+                                                            title="Network Train Store File Upload"
+                                                            nn_id={this.state.nn_id} 
+                                                            nn_wf_ver_id={this.state.file_wf_ver_id} 
+                                                            nn_node_name={this.state.train_node_name} 
+                                                            nn_path_type={"store"} 
+                                                            uploadbtnflag={false} 
+                                                            deletebtnflag={true} />
+                                    </td>
+                                    <td style={{"verticalAlign":"top"}}>
+                                        <FileUploadComponent ref="evalfilestr" 
+                                                            title="Network Eval Store File Upload"
+                                                            nn_id={this.state.nn_id} 
+                                                            nn_wf_ver_id={this.state.file_wf_ver_id} 
+                                                            nn_node_name={this.state.eval_node_name} 
+                                                            nn_path_type={"store"}
+                                                            uploadbtnflag={false} 
+                                                            deletebtnflag={true} />
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </TabPanel>
+                </Tabs>
+                :
+                    <div>
+                            <table className="partition_half">
+                                <tr>
+                                    <td style={{"verticalAlign":"top"}}>
+                                        <FileUploadComponent ref="trainfilesrc" 
+                                                            title= "Network Train Source File Upload"
+                                                            nn_id={this.state.nn_id} 
+                                                            nn_wf_ver_id={this.state.file_wf_ver_id} 
+                                                            nn_node_name={this.state.train_node_name} 
+                                                            nn_path_type={"source"}
+                                                            uploadbtnflag={true} 
+                                                            deletebtnflag={true} />
+                                    </td>
+
+                                    <td style={{"verticalAlign":"top"}}>
+                                        <FileUploadComponent ref="evalfilesrc" 
+                                                            title= "Network Eval Source File Upload"
+                                                            nn_id={this.state.nn_id} 
+                                                            nn_wf_ver_id={this.state.file_wf_ver_id} 
+                                                            nn_node_name={this.state.eval_node_name} 
+                                                            nn_path_type={"source"}
+                                                            uploadbtnflag={true} 
+                                                            deletebtnflag={true} />
+                                    </td>
+                                </tr>
+                            </table>
+        
+                             <table className="partition_half">
+                                <tr>
+                                    <td style={{"verticalAlign":"top"}}>
+                                        <FileUploadComponent ref="trainfilestr" 
+                                                            title="Network Train Store File Upload"
+                                                            nn_id={this.state.nn_id} 
+                                                            nn_wf_ver_id={this.state.file_wf_ver_id} 
+                                                            nn_node_name={this.state.train_node_name} 
+                                                            nn_path_type={"store"} 
+                                                            uploadbtnflag={false} 
+                                                            deletebtnflag={true} />
+                                    </td>
+                                    <td style={{"verticalAlign":"top"}}>
+                                        <FileUploadComponent ref="evalfilestr" 
+                                                            title="Network Eval Store File Upload"
+                                                            nn_id={this.state.nn_id} 
+                                                            nn_wf_ver_id={this.state.file_wf_ver_id} 
+                                                            nn_node_name={this.state.eval_node_name} 
+                                                            nn_path_type={"store"}
+                                                            uploadbtnflag={false} 
+                                                            deletebtnflag={true} />
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                }
+                <br/>
 
                 <Tabs defaultIndex={0}  onSelect={tabIndex => this.networkSelectTab({ tabIndex })} >
                     <TabList>
                       <Tab>Classification</Tab>
                       <Tab>Acc&Loss</Tab>
+                      <Tab>BatchInfo</Tab>
+                      <Tab>Config</Tab>                     
                     </TabList>
 
                     <TabPanel>
                         <div>
-                            <h2> Label Classification chart ({this.state.nn_batch_id})</h2>
+                            <h2> Train Label Classification chart (Batch : {this.state.nn_batch_id})</h2>
                             <NN_InfoDetailStackBar ref="stackbar" NN_Data={this.state.tBarChartBTData} />
                         </div>
                     </TabPanel>
                     <TabPanel>
                         <div>
-                            <h2> Train Model Acc&Loss chart ({this.state.nn_batch_id})</h2>
+                            <h2> Train Model Acc&Loss chart (Batch : {this.state.nn_batch_id})</h2>
                             <NN_InfoDetailLine ref="line" NN_Data={this.state.NN_TableWFDataAccLoss} />
                         </div>
-
                     </TabPanel> 
+                    <TabPanel>
+                        <div>
+                            <h2> Network Batch Info (Version : {this.state.nn_wf_ver_id}) </h2>
+                            <table className="table detail" ref= 'master3' >
+                                {batchInfoListTable}
+                            </table>
+                        </div>
+                    </TabPanel> 
+                    <TabPanel>
+                        <div>
+                            <h2> Network Node Info (Version : {this.state.nn_wf_ver_id}) </h2>
+                            <table className="table detail" ref= 'master4' >
+                                {nodeInfoListTable}
+                            </table>
+                        </div>
+
+                        <div>
+                            <h2> Network Config ({this.state.nodeType}) </h2>
+                            <JsonConfComponent ref="netconfig" 
+                                                editable={this.state.configEditFlag} 
+                                                NN_TableDataDetail={this.state.NN_TableNodeDataSort} />
+                        </div>
+                    </TabPanel> 
+                    
                 </Tabs>
                 
 
                 
-
-                <div>
-                    <table className="partition_half">
-                    <tr>
-                    <td style={{"verticalAlign":"top"}}>
-                    <FileUploadComponent ref="trainfilesrc" 
-                                            title= "Network Train Source File Upload"
-                                            nn_id={this.state.nn_id} 
-                                            nn_wf_ver_id={this.state.file_wf_ver_id} 
-                                            nn_node_name={this.state.train_node_name} 
-                                            nn_path_type={"source"}
-                                            uploadbtnflag={true} 
-                                            deletebtnflag={true} />
-                    </td>
-
-                    <td style={{"verticalAlign":"top"}}>
-                    <FileUploadComponent ref="evalfilesrc" 
-                                            title= "Network Eval Source File Upload"
-                                            nn_id={this.state.nn_id} 
-                                            nn_wf_ver_id={this.state.file_wf_ver_id} 
-                                            nn_node_name={this.state.eval_node_name} 
-                                            nn_path_type={"source"}
-                                            uploadbtnflag={true} 
-                                            deletebtnflag={true} />
-                    </td>
-
-                    </tr></table></div>
-
-                 <div>
-                 <table className="partition_half">
-                    <tr>
-                    <td style={{"verticalAlign":"top"}}>
-                    <FileUploadComponent ref="trainfilestr" 
-                                            title="Network Train Store File Upload"
-                                            nn_id={this.state.nn_id} 
-                                            nn_wf_ver_id={this.state.file_wf_ver_id} 
-                                            nn_node_name={this.state.train_node_name} 
-                                            nn_path_type={"store"} 
-                                            uploadbtnflag={false} 
-                                            deletebtnflag={true} />
-                    </td>
-
-                    <td style={{"verticalAlign":"top"}}>
-                    <FileUploadComponent ref="evalfilestr" 
-                                            title="Network Eval Store File Upload"
-                                            nn_id={this.state.nn_id} 
-                                            nn_wf_ver_id={this.state.file_wf_ver_id} 
-                                            nn_node_name={this.state.eval_node_name} 
-                                            nn_path_type={"store"}
-                                            uploadbtnflag={false} 
-                                            deletebtnflag={true} />
-                    </td>
-
-                    </tr>
-
-
-                    </table>
-                </div>
-
-                <div>
-                    <h2> Network Node Info </h2>
-                    <table className="table detail" ref= 'master4' >
-                        {nodeInfoListTable}
-                    </table>
-                </div>
-
-                <div>
-                    <h2> Network Config ({this.state.nodeType}) </h2>
-                    <JsonConfComponent ref="netconfig" editable="N" NN_TableDataDetail={this.state.NN_TableNodeDataSort} />
-                </div>
 
 
             </div>

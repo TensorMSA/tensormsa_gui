@@ -26,15 +26,19 @@ export default class NN_InfoDetailLine extends React.Component {
     // Version Batch Bar Chart
     /////////////////////////////////////////////////////////////////////////////////////////   
     setLineChartData(lineData){
-      let acc = lineData['train_acc_info']['acc']
-      let loss = lineData['train_loss_info']['loss']
-      let data = []
-      for(let rows in acc){
-        let key = rows*1+1
-        let accrow = acc[rows]*1
-        let lossrow = loss[rows]*1
-        data.push({name: key, acc: accrow, loss: lossrow})
+      let data = null
+      if(lineData['train_acc_info'] != null && lineData['train_loss_info'] != null){
+        let acc = lineData['train_acc_info']['acc']
+        let loss = lineData['train_loss_info']['loss']
+        data = []
+        for(let rows in acc){
+          let key = rows*1+1
+          let accrow = acc[rows]*1
+          let lossrow = loss[rows]*1
+          data.push({name: key, acc: accrow, loss: lossrow})
+        }
       }
+      
 
       this.state.NN_Data = data
       // this.setState({NN_Data: data})

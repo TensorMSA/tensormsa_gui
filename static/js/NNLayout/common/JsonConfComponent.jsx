@@ -15,7 +15,8 @@ export default class JsonConfComponent extends React.Component {
             color : "#14c0f2",
             lastdata:"last",
             arrayData : "[ ]",
-            jsonData : "{ }"    
+            jsonData : "{ }",
+            config:{}
         };
         this.getConfigData = this.getConfigData.bind(this);
     }
@@ -75,7 +76,7 @@ export default class JsonConfComponent extends React.Component {
     }
 
     // Table에 있는 값을 가져와 Json으로 만들어주는 함수.
-    getConfigData(makeType){
+    getConfigData(){
         let noconfTable = this.refs.master3
         let tdata = noconfTable.rows
         let sColor = this.state.lastdata
@@ -124,9 +125,9 @@ export default class JsonConfComponent extends React.Component {
                 let inputType = ""
                 if(vcolor == sColor && arrflag == "N"){// 배열이 아닌 마지막 값을 가진 Cell 이 오면 
                     inputType = preData[k+1][3]  
-                    if(makeType != null && makeType == "auto"){
+                    if(this.props.tabIndexAS == 1){
                         param["type"] = inputType
-                        if(param["option"] == undefined){
+                        if(param["option"] == undefined ){
                             param["option"] = null
                         }
                         if(param["auto"] == undefined){
@@ -141,7 +142,7 @@ export default class JsonConfComponent extends React.Component {
                     }else if(vdata == "null"){
                         param[textdata] = null
                     }else{
-                        if(inputType == "int"){
+                        if(vdata == vdata*1){
                             vdata *= 1
                         }
                         param[textdata] = vdata // 일반 데이터 값을 넣어준다.
@@ -154,9 +155,9 @@ export default class JsonConfComponent extends React.Component {
 
                     if(preData[k+2] != null && preData[k+2][3] != ""){
                         inputType = preData[k+2][3]
-                        if(makeType != null && makeType == "auto"){
+                        if(this.props.tabIndexAS == 1){
                             param["type"] = inputType
-                            if(param["option"] == undefined){
+                            if(param["option"] == undefined ){
                                 param["option"] = null
                             }
                             if(param["auto"] == undefined){
@@ -164,7 +165,7 @@ export default class JsonConfComponent extends React.Component {
                             }
                         }
 
-                        if(inputType == "int"){
+                        if(preData[k+2][0] == preData[k+2][0]*1){
                             preData[k+2][0] *= 1
                         }
                     }
@@ -181,6 +182,11 @@ export default class JsonConfComponent extends React.Component {
             }
         }
         return params
+    }
+
+    handleChangeConf(value){
+        // this.state.config[this.props.nodeType] = this.getConfigData()
+        // console.log(this.state.config)
     }
 
     render() {
@@ -525,6 +531,7 @@ export default class JsonConfComponent extends React.Component {
                                         <select ref={"sel"+k} 
                                                id={k} 
                                                alt ={this.state.lastdata}
+                                               onChange = {this.handleChangeConf.bind(this)}
                                                 defaultValue={defaultVal[0]}
                                                style={{"color":this.state.color, "width":"100%", "fontWeight":"bold"}}
                                                rowSpan={1}>
@@ -560,6 +567,7 @@ export default class JsonConfComponent extends React.Component {
                                                     ,"textAlign":"center"
                                                     , "width":"100%"
                                                     , "fontWeight":"bold"}} 
+                                            onChange = {this.handleChangeConf.bind(this)}
                                             defaultValue = {rowData} />  </td>)
                             }else{
                                 colData.push(<td key={k++} alt ={this.state.lastdata} type={datatype} 

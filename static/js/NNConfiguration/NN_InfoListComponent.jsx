@@ -19,8 +19,9 @@ export default class NN_InfoListComponent extends React.Component {
                             ,{index:3, id:"nn_title",       name:"Title"}
                             ,{index:4, id:"nn_desc",        name:"Description"}
                             ,{index:5, id:"dir",            name:"Network Type"}
-                            ,{index:6, id:"nn_id",          name:"ID"}
-                            ,{index:7, id:"nn_wf_ver_id",   name:"Ver"}
+                            ,{index:6, id:"autosingle",     name:"Train Type"}
+                            ,{index:7, id:"nn_id",          name:"ID"}
+                            ,{index:8, id:"nn_wf_ver_id",   name:"Ver"}
                             ],
             selModalView: null,
             NN_ID : null,
@@ -219,6 +220,7 @@ export default class NN_InfoListComponent extends React.Component {
         for(let rows in this.state.NN_TableData){
             let colData = [];
             let row = this.state.NN_TableData[rows]
+            let autokeys = Object.keys(row["automl_parms"])
 
             colData.push(<td key={k++} > < input type = "checkbox" name="rd1"
                                                                     alt = {row["nn_id"]}
@@ -245,6 +247,11 @@ export default class NN_InfoListComponent extends React.Component {
 
 
             colData.push(<td key={k++} alt = {row["nn_id"]} > {row["dir"]} </td>) 
+            if(autokeys.length == 0){
+                colData.push(<td key={k++} alt = {row["nn_id"]} > {"Single"} </td>) 
+            }else{
+                colData.push(<td key={k++} alt = {row["nn_id"]} > {"Auto"} </td>) 
+            }
             colData.push(<td key={k++} alt = {row["nn_id"]} 
                                 style ={{"color":this.state.nn_color, "cursor":"pointer", "fontWeight":"bold"}}
                                 onClick={() => this.handleClick(row) } > {row["nn_id"]} </td>) 

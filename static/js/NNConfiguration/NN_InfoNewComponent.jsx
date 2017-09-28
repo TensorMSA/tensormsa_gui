@@ -34,7 +34,9 @@ export default class NN_InfoNewComponent extends React.Component {
                                 ,{index:2,      id:"example",               name:"Example"}
                             ],
             NN_TableRowArr2:["generation","population","survive"],
-            tabIndex:1
+            tabIndex:1,
+            tabIndexAS:1,
+            autoMasterView:true
         };
     }
 
@@ -89,46 +91,43 @@ export default class NN_InfoNewComponent extends React.Component {
 
         let table = this.refs.master1
         let col = this.state.NN_TableColArr1
-        
-        // Validation Check Master1
-        for (let i=1 ; i < table.rows.length ; i++) {
-            title = table.rows[i].cells[this.findColInfo(col, "id", "title").index].innerText
-            input_data = table.rows[i].cells[this.findColInfo(col, "id", "input_data").index].children[0].value
-            if(input_data == null || input_data == ""){ alert( title + " is not exist." );return; flag = "F"; break;}
-        }   
 
         // Make NN Info
         let dparam = {}
+        dparam["use_flag"] = "Y"
+        dparam["config"] = "N"
+        dparam["dir"] = netType
+
         for (let i=1 ; i < table.rows.length ; i++) {
             title = table.rows[i].cells[this.findColInfo(col, "id", "title").index].innerText
             input_data = table.rows[i].cells[this.findColInfo(col, "id", "input_data").index].children[0].value
             dparam[this.state.NN_TableRowArr1[i]] = input_data
+            // Validation Check Master1
+            if(input_data == null || input_data == ""){ alert( title + " is not exist." );return; flag = "F"; break;}
         }
 
-        let params = refsTab.refs.netconfig.getConfigData("auto")
-        dparam["use_flag"] = "Y"
-        dparam["config"] = "N"
-        dparam["dir"] = netType
-        dparam["automl_parms"] = params
-
-        let tableAuto = this.refs.master2
-        let colAuto = this.state.NN_TableColArr2
-
-        // Validation Check MasterAuto
-        for (let i=0 ; i < tableAuto.rows.length ; i++) {
-            title = tableAuto.rows[i].cells[this.findColInfo(col, "id", "title").index].innerText
-            input_data = tableAuto.rows[i].cells[this.findColInfo(col, "id", "input_data").index].children[0].value
-            if(input_data == null || input_data == ""){ alert( title + " is not exist." );return; flag = "F"; break;}
-        }   
+        let params = refsTab.refs.netconfig.getConfigData()
+        let nodekeys = Object.keys(params)
 
         // Make NNAuto Info
         let aparam = {}
-        for (let i=0 ; i < tableAuto.rows.length ; i++) {
-            title = tableAuto.rows[i].cells[this.findColInfo(col, "id", "title").index].innerText
-            input_data = tableAuto.rows[i].cells[this.findColInfo(col, "id", "input_data").index].children[0].value*1
-            aparam[this.state.NN_TableRowArr2[i]] = input_data
-        }
 
+        if(this.state.tabIndexAS == 1){
+            dparam["automl_parms"] = params
+
+            let tableAuto = this.refs.master2
+            let colAuto = this.state.NN_TableColArr2
+
+            // Validation Check MasterAuto
+            for (let i=0 ; i < tableAuto.rows.length ; i++) {
+                title = tableAuto.rows[i].cells[this.findColInfo(col, "id", "title").index].innerText
+                input_data = tableAuto.rows[i].cells[this.findColInfo(col, "id", "input_data").index].children[0].value*1
+                aparam[this.state.NN_TableRowArr2[i]] = input_data
+                // Validation Check Master2
+                if(input_data == null || input_data == ""){ alert( title + " is not exist." );return; flag = "F"; break;}
+            }   
+        }
+        
         // Make NN WF Info
         let wfparam = {}
         wfparam["nn_def_list_info_nn_id"] = ""
@@ -151,12 +150,6 @@ export default class NN_InfoNewComponent extends React.Component {
 
         //  "nn00000030"
         // let wf_ver_id = "1"
-                // // Make NN WF Info
-                // this.props.reportRepository.postCommonNNInfoWF(nn_id, wfparam).then((wf_ver_id) => {
-                //     this.setState({ wf_ver_id: wf_ver_id })
-                //     // Make NN WF Node Info
-                //     this.props.reportRepository.postCommonNNInfoWFNode(nn_id, wf_ver_id, nodeparam).then((tableData) => {
-                        // Train File Save
 
         let re = confirm( "Are you create?" )
         let nn_id = ""
@@ -178,20 +171,59 @@ export default class NN_InfoNewComponent extends React.Component {
                     }
                 }
 
-                if(netconf_data_name != "" && eval_data_name != "")
+                if(netconf_data_name != "" && eval_data_name != ""){
                     this.props.reportRepository.putFileUpload(nn_id, 'common', netconf_data_name, tfparam).then((tableData) => {
                         this.props.reportRepository.putFileUpload(nn_id, 'common', eval_data_name, efparam).then((tableData) => {
-                            //Set AutoML Parameter
-                            this.props.reportRepository.postCommonNNInfoAutoSetup(nn_id, aparam).then((tableData) => {
-                                //Run AutoML
-                                this.props.reportRepository.postCommonNNInfoAuto(nn_id).then((tableData) => {
-                                
+                            if(this.state.tabIndexAS == 1){
+                                //Set AutoML Parameter
+                                this.props.reportRepository.postCommonNNInfoAutoSetup(nn_id, aparam).then((tableData) => {
+                                    // //Run AutoML
+                                    // this.props.reportRepository.postCommonNNInfoAuto(nn_id).then((tableData) => {
+                                    
+                                    // });
                                 });
-                            });
+                            }else{
+                                //version create
+                                this.props.reportRepository.postCommonNNInfoWF(nn_id, wfparam).then((ver) => {
+                                    //node create
+                                    this.props.reportRepository.postCommonNNInfoWFNode(nn_id, ver, nodeparam).then((tableData) => {
+                                        //node config update
+                                        for(let i in nodekeys){
+                                            this.props.reportRepository.putCommonNNInfoWFNode(nn_id, ver, nodekeys[i], params[nodekeys[i]]).then((tableData) => {
+
+                                            });
+                                        }
+                                    });
+                                });
+                            }
                         });
                     });
+                }
             });
         } 
+    }
+
+    networkSelectTabAS(value){
+        // let tab = value.target.innerText
+        value = value.tabIndexAS + 1
+        this.setState({ tabIndexAS: value })
+
+        if(value == 2){
+            this.state.autoMasterView = false
+        }else{
+            this.state.autoMasterView = true
+        }
+
+        let refsTab = this.refs.netDetail1
+            
+        if(refsTab == undefined){
+            refsTab = this.refs.netDetail2
+            if(refsTab == undefined){
+                refsTab = this.refs.netDetail3
+            }
+        }
+
+        refsTab.setConfigData()
     }
 
     networkSelectTab(value){
@@ -199,6 +231,8 @@ export default class NN_InfoNewComponent extends React.Component {
         value = value.tabIndex + 1
         this.setState({ tabIndex: value })
     }
+
+
 
     render() {
         let k = 1
@@ -292,58 +326,76 @@ export default class NN_InfoNewComponent extends React.Component {
                         <h1> Network Info </h1>
                     </div>
 
-
-                    <div ref="masterInfo">
-                        <table className="table detail" ref= 'master1' >
-                            {masterListTable}
-                        </table>
-
-                        <table className="table detail" ref= 'master2' >
-                            {masterListTableAuto}
-                        </table>
-                    </div>
-
-
-                        
-
-                    <div>
-                        <h1> Network Select </h1>
-                    </div>
-
-                    <Tabs defaultIndex={0}  onSelect={tabIndex => this.networkSelectTab({ tabIndex })} >
-                    <TabList>
-                      <Tab>Frame</Tab>
-                      <Tab>Image</Tab>
-                      <Tab>NLP</Tab>
-                    </TabList>
-
-                    <TabPanel>
-                        <NN_InfoNewCompDetail1 ref="netDetail1" 
-                                                tabIndex={this.state.tabIndex} 
-                                                train_node_name={this.state.train_node_name}
-                                                eval_node_name={this.state.eval_node_name}
-                                                tmp_train_node_name={this.state.tmp_train_node_name}
-                                                tmp_eval_node_name={this.state.tmp_eval_node_name} />
-                    </TabPanel>
-                    <TabPanel>
-                        <NN_InfoNewCompDetail1 ref="netDetail2" tabIndex={this.state.tabIndex} 
-                                                train_node_name={this.state.train_node_name}
-                                                eval_node_name={this.state.eval_node_name}
-                                                tmp_train_node_name={this.state.tmp_train_node_name}
-                                                tmp_eval_node_name={this.state.tmp_eval_node_name} />
-                    </TabPanel> 
-                    <TabPanel>
-                        <NN_InfoNewCompDetail1 ref="netDetail3" tabIndex={this.state.tabIndex} 
-                                                train_node_name={this.state.train_node_name}
-                                                eval_node_name={this.state.eval_node_name}
-                                                tmp_train_node_name={this.state.tmp_train_node_name}
-                                                tmp_eval_node_name={this.state.tmp_eval_node_name} />
-                    </TabPanel>
+                    <Tabs key={k++} defaultIndex={0}  onSelect={tabIndexAS => this.networkSelectTabAS({ tabIndexAS })} >
+                        <TabList key={k++}>
+                          <Tab key={k++}>Auto</Tab>
+                          <Tab key={k++}>Single</Tab>
+                        </TabList>
+                        <TabPanel key={k++}>
+                        </TabPanel>
+                        <TabPanel key={k++}>
+                        </TabPanel>
                     </Tabs>
+                    
+                        <div ref="masterInfo">
+                            <table className="table detail" ref= 'master1' >
+                                {masterListTable}
+                            </table>
+                        </div>
 
+                        {this.state.autoMasterView ?
+                            <div>
+                                <table className="table detail" ref= 'master2' >
+                                    {masterListTableAuto}
+                                </table>
+                            </div>
+                            :
+                            <div>
+                            </div>
+                        }
+                        
+                        <div>
+                            <h1> Network Select </h1>
+                        </div>
 
+                        <Tabs key={k++} defaultIndex={0}  onSelect={tabIndex => this.networkSelectTab({ tabIndex })} >
+                        <TabList key={k++}>
+                          <Tab key={k++}>Frame</Tab>
+                          <Tab key={k++}>Image</Tab>
+                          <Tab key={k++}>NLP</Tab>
+                        </TabList>
+
+                            <TabPanel key={k++}>
+                                <NN_InfoNewCompDetail1 ref="netDetail1" tabIndex={this.state.tabIndex}
+                                                        tabIndexAS={this.state.tabIndexAS} 
+                                                        train_node_name={this.state.train_node_name}
+                                                        eval_node_name={this.state.eval_node_name}
+                                                        tmp_train_node_name={this.state.tmp_train_node_name}
+                                                        tmp_eval_node_name={this.state.tmp_eval_node_name} />
+                            </TabPanel>
+                            <TabPanel key={k++}>
+                                <NN_InfoNewCompDetail1 ref="netDetail2" tabIndex={this.state.tabIndex} 
+                                                        tabIndexAS={this.state.tabIndexAS} 
+                                                        train_node_name={this.state.train_node_name}
+                                                        eval_node_name={this.state.eval_node_name}
+                                                        tmp_train_node_name={this.state.tmp_train_node_name}
+                                                        tmp_eval_node_name={this.state.tmp_eval_node_name} />
+                            </TabPanel> 
+                            <TabPanel key={k++}>
+                                <NN_InfoNewCompDetail1 ref="netDetail3" tabIndex={this.state.tabIndex} 
+                                                        tabIndexAS={this.state.tabIndexAS} 
+                                                        train_node_name={this.state.train_node_name}
+                                                        eval_node_name={this.state.eval_node_name}
+                                                        tmp_train_node_name={this.state.tmp_train_node_name}
+                                                        tmp_eval_node_name={this.state.tmp_eval_node_name} />
+                            </TabPanel>
+                        </Tabs>
+                   
+                
+                    
 
                     
+
                 </div>
 
             </section>

@@ -104,8 +104,8 @@ export default class ReportRepository {
         });
     }
 
-    putCommonNNInfoWFNode(params, wf_ver_id, jsonData) {
-        return this.api.put('/api/v1/type/wf/target/init/mode/simple/'+params+'/wfver/'+wf_ver_id+'/', jsonData).then((data) => {
+    putCommonNNInfoWFNode(params, wf_ver_id, node, jsonData) {
+        return this.api.put('/api/v1/type/wf/direct/nnid/'+params+'/ver/'+wf_ver_id+'/node/'+node+'/', jsonData).then((data) => {
             data = JSON.parse(data);
             this.log("putCommonNNInfoWFNode", data)
             return data;

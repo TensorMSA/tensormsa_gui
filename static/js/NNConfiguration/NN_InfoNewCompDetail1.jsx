@@ -41,6 +41,7 @@ export default class NN_InfoNewCompDetail1 extends React.Component {
             isViewImage: false,//Net Select Image view
             isViewImageDetail : null,//Net Select Image view
             netType : null,
+            url : EnvConstants.getWebServerUrl(),
             NN_TableColArr1:[    {index:0,      id:"sel",                   name:"Sel"}
                                 ,{index:1,      id:"network",               name:"Network"}
                                 ,{index:2,      id:"description",           name:"Description"}
@@ -49,6 +50,7 @@ export default class NN_InfoNewCompDetail1 extends React.Component {
 
                             ]
         };
+        this.setConfigData = this.setConfigData.bind(this); 
     }
 
     // 최초 1회 실행하여 Network Config List를 가져온다.
@@ -67,7 +69,20 @@ export default class NN_InfoNewCompDetail1 extends React.Component {
     // get Network config list ex)netconf_node, dataconf_node
     getCommonNNInfoAutoDetail(row){
         this.props.reportRepository.getCommonNNInfoAuto(row).then((tableData) => {
-            this.setState({ NN_TableDataDetail: tableData })
+            if(tableData[0] == undefined){
+                this.setState({ NN_TableDataDetail: null })
+            }else{
+                let auto = [tableData[0]['fields']['graph_flow_data']]
+                let single = [tableData[0]['fields']['graph_flow_data_single']]
+                if(this.props.tabIndexAS == 1){
+                    this.setState({ NN_TableDataDetail: auto })
+                }else{
+                    this.setState({ NN_TableDataDetail: single})
+                }
+            }
+            
+            
+            
         });
     }
 
@@ -97,12 +112,23 @@ export default class NN_InfoNewCompDetail1 extends React.Component {
                     key.checked = true
                 }else if(key.value == value && key.checked == true){
                     key.checked = false
+                    value = ""
                 }
             }
         }
         this.state.netType = value
 
-        this.getCommonNNInfoAutoDetail(value);
+        this.getCommonNNInfoAutoDetail(value)
+    }
+
+    setConfigData(){
+        let netSelectTable = this.refs.master2
+        for(let i=1 ; i < netSelectTable.rows.length ; i++){
+            let key = netSelectTable.rows[i].children[0].children.rd1
+            if(key.checked == true){
+                this.getCommonNNInfoAutoDetail(key.value)
+            }
+        }
     }
 
     // Network 를 선택 하면 아래에 Image를 보여준다.
@@ -115,18 +141,15 @@ export default class NN_InfoNewCompDetail1 extends React.Component {
             this.setState({ isViewImage: true })
             this.setState({ isViewImageDetail: url })
         }
-
-        this.handleChangeRadio(value)
     }
 
     fileDownloadFunc(selectedValue){
         let path = selectedValue.target.alt
-        let url = EnvConstants.getWebServerUrl()+path
-
+        let url = this.state.url
+        url = url+path
         console.log(url)
-        downloadFile(url);
+        // downloadFile(url);
     }
-
 
     render() {
         let k = 1
@@ -188,13 +211,13 @@ export default class NN_InfoNewCompDetail1 extends React.Component {
             colDataSL.push(<td key={k++} value = {row["id"]} onClick={this.handleChangeRadio.bind(this)} > {row["id"]} </td>) 
             colDataSL.push(<td key={k++} value = {row["id"]} style={{"textAlign":"left"}} onClick={this.handleChangeRadio.bind(this)} > {row["desc"]} </td>) 
             clickUrl = "./images/ico_menu03.png"
-            colDataSL.push(<td key={k++} > <img style ={{width:20, "cursor":"pointer"}} alt = {row["path"]}
-                                                onClick={this.fileDownloadFunc.bind(this)} 
-                                                src={clickUrl} /></td>)
+            colDataSL.push(<td key={k++} > <a href= {row["path"]} download ><img src={clickUrl} /></a></td>)
             clickUrl = "./images/ico_help_on.png"
             colDataSL.push(<td key={k++} > <img style ={{width:20, "cursor":"pointer"}} alt = {row["id"]}
                                                 onClick={this.viewNetImage.bind(this)} 
                                                 src={clickUrl} /></td>)
+
+            
 
             tableDataSL.push(<tr key={k++}>{colDataSL}</tr>)
         }
@@ -262,8 +285,13 @@ export default class NN_InfoNewCompDetail1 extends React.Component {
                     <div>
                         <h2> Network Config ({this.state.netType}) </h2>
                     </div>
- 
-                    <JsonConfComponent ref="netconfig" editable="Y" NN_TableDataDetail={this.state.NN_TableDataDetail} />
+  
+                        <JsonConfComponent ref="netconfig"
+                                            tabIndexAS = {this.props.tabIndexAS} 
+                                            editable="Y" 
+                                            NN_TableDataDetail={this.state.NN_TableDataDetail} />
+
+
  <div>
                     <table className="table detail">
                     <tr>
@@ -293,6 +321,7 @@ export default class NN_InfoNewCompDetail1 extends React.Component {
 
                     </tr>
                     </table>
+
                     </div>
             </section>
 

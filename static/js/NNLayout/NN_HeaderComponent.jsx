@@ -50,23 +50,23 @@ export default class NN_HeaderComponent extends React.Component {
 					}
 				}
 				break;
-            case 6:
-            	if(this.context.NN_TRAIN || this.context.NN_TYPE == 'cifar'){
-	                return this.props.getHeaderEvent(6); 
-	            } else {
-					console.log("Can't predict. - " + JSON.stringify(this.context))
-					if (!this.context.NN_TRAIN) {
-						msg.show("학습이 완료되지 않았습니다.")
-					}
-				}
-			case 7:
+			case 6:
             	if(this.context.NN_CONFIG && this.context.NN_TYPE != 'cifar'){
-	                return this.props.getHeaderEvent(7); 
+	                return this.props.getHeaderEvent(6); 
             	} else {
 					if (!this.context.NN_CONFIG) {
 						msg.show("설정이 완료되지 않았습니다.")
 					}
 				}
+			case 7:
+            	// if(this.context.NN_TRAIN || this.context.NN_TYPE == 'cifar'){
+	                return this.props.getHeaderEvent(7); 
+	   //          } else {
+				// 	console.log("Can't predict. - " + JSON.stringify(this.context))
+				// 	if (!this.context.NN_TRAIN) {
+				// 		msg.show("학습이 완료되지 않았습니다.")
+				// 	}
+				// }
             case 8:
             	return this.props.getHeaderEvent(8);
         }

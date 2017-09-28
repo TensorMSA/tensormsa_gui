@@ -26,6 +26,11 @@ export default class NN_InfoDetailBarLine extends React.Component {
     // Version Batch Bar Chart
     /////////////////////////////////////////////////////////////////////////////////////////   
     setLineChartData(lineData){
+      function pad(n, width) {
+        n = n + '';
+        return n.length >= width ? n : new Array(width - n.length + 1).join('0') + n;
+      }
+
       let best = lineData['best']
       let bygen = lineData['bygen']
 
@@ -36,13 +41,13 @@ export default class NN_InfoDetailBarLine extends React.Component {
         let row = bygen[rows]
         let avg = 0
         for(let col in row){
-          subData['name'] = 'Gen'+(rows*1+1)
-          subData[row[col]['nn_wf_ver_id']+''] = (row[col]['acc']*100).toFixed(2)*1
+          subData['name'] = 'Gen'+pad((rows*1+1),3)
+          subData[pad(row[col]['nn_wf_ver_id'],3)] = (row[col]['acc']*100).toFixed(2)*1
           avg = avg + (row[col]['acc']*100).toFixed(2)*1
           subData['s'+row[col]['nn_wf_ver_id']] = row[col]['survive']
 
-          if(this.state.NN_Labels.indexOf(row[col]['nn_wf_ver_id']) == -1){
-            this.state.NN_Labels.push(row[col]['nn_wf_ver_id'])
+          if(this.state.NN_Labels.indexOf(pad(row[col]['nn_wf_ver_id'],3)) == -1){
+            this.state.NN_Labels.push(pad(row[col]['nn_wf_ver_id'],3))
           }
         }
 
