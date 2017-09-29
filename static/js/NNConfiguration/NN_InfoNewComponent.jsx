@@ -199,8 +199,11 @@ export default class NN_InfoNewComponent extends React.Component {
                         });
                     });
                 }
+                this.props.setActiveItem(nn_id, "C", null, null, null, null, null, null)
+                return this.props.getHeaderEvent(2);
             });
-        } 
+
+        }
     }
 
     networkSelectTabAS(value){

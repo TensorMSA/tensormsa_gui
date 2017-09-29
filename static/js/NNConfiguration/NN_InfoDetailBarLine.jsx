@@ -13,6 +13,7 @@ export default class NN_InfoDetailBarLine extends React.Component {
             NN_Labels:[],
             lineChartLabels:null,
             lineChartData:null,
+            barCnt : 5,
             color:['#ef867a','#69f3cf','#cf7425','#995f7c','#68299f','#a37178','#8893a4','f2584f','#469da9','#5dda73'] 
         };
     }
@@ -31,34 +32,58 @@ export default class NN_InfoDetailBarLine extends React.Component {
         return n.length >= width ? n : new Array(width - n.length + 1).join('0') + n;
       }
 
+      function sortByKey(array, key) {
+          return array.sort(function(a, b) {
+              var x = a[key]; var y = b[key];
+              return ((x < y) ? -1 : ((x > y) ? 1 : 0));
+          });
+      }
+
+      function sortData(data, id){
+          let nnInfoNewList = [];
+          if (data != null) {
+              for (var i in data) {
+                  nnInfoNewList[i] = data[i];
+              }
+          }
+
+          nnInfoNewList = sortByKey(nnInfoNewList, id);
+          return nnInfoNewList
+      }
+
       let best = lineData['best']
       let bygen = lineData['bygen']
 
       let data = []
-    
+      
+      
       for(let rows in bygen){
         let subData = {}
         let row = bygen[rows]
+        let rowSort = sortData(row, "acc")
         let avg = 0
-        for(let col in row){
-          subData['name'] = 'Gen'+pad((rows*1+1),3)
-          subData[pad(row[col]['nn_wf_ver_id'],3)] = (row[col]['acc']*100).toFixed(2)*1
-          avg = avg + (row[col]['acc']*100).toFixed(2)*1
-          subData['s'+row[col]['nn_wf_ver_id']] = row[col]['survive']
-
-          if(this.state.NN_Labels.indexOf(pad(row[col]['nn_wf_ver_id'],3)) == -1){
-            this.state.NN_Labels.push(pad(row[col]['nn_wf_ver_id'],3))
+        let maxcnt =1
+        subData['name'] = 'Gen'+pad(rows*1+1,3)
+        for(let i=rowSort.length-1 ; i>=0 ; i--){
+          subData[pad(maxcnt,2)] = (rowSort[i]['acc']*100).toFixed(2)*1
+          avg = avg + (rowSort[i]['acc']*100).toFixed(2)*1
+          if(this.state.NN_Labels.indexOf(pad(maxcnt,2)) == -1){
+            this.state.NN_Labels.push(pad(maxcnt,2))
           }
+          
+          if(maxcnt >= this.state.barCnt){
+            break
+          }
+          maxcnt += 1
         }
 
         subData['avg'] = (avg/row.length).toFixed(2)*1
         data.push(subData)
 
       }
+
       this.state.NN_Labels = this.state.NN_Labels.sort()
       this.setState({ NN_Data: data })
-
-
     }
 
     lineChartOnClick(value){//Chart의 세부 카테고리 정보를 보여준다.

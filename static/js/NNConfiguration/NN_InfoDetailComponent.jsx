@@ -20,6 +20,7 @@ export default class NN_InfoDetailComponent extends React.Component {
         super(props);
         this.state = {
             tableData: null,
+            NN_TableData: null,
             NN_TableWFData: null,
             NN_TableWFDataAccLoss: null,
             NN_TableNodeData: null,
@@ -203,11 +204,12 @@ export default class NN_InfoDetailComponent extends React.Component {
 
     searchData(){
         this.getCommonNNInfoWF()
-        this.refs.trainfilesrc.getFileData()
-        this.refs.trainfilestr.getFileData()
-        this.refs.evalfilesrc.getFileData()
-        this.refs.evalfilestr.getFileData()
-
+        if(this.refs.trainfilesrc != undefined){
+            this.refs.trainfilesrc.getFileData()
+            this.refs.trainfilestr.getFileData()
+            this.refs.evalfilesrc.getFileData()
+            this.refs.evalfilestr.getFileData()
+        }
     }
     /////////////////////////////////////////////////////////////////////////////////////////
     // Search Function
@@ -225,6 +227,7 @@ export default class NN_InfoDetailComponent extends React.Component {
                 this.state.netType = tableData['fields'][0]["dir"]
 
                 let autokeys = Object.keys(tableData['fields'][0]["automl_parms"])
+                this.state.NN_TableData = tableData['fields'][0]
                 if(autokeys.length == 0){
                     this.state.trainType = false
                     this.state.configEditFlag = "Y"
@@ -252,7 +255,10 @@ export default class NN_InfoDetailComponent extends React.Component {
                 });
 
                 this.getCommonNodeInfoView()
+
             });
+            
+
         }   
     }
 
@@ -674,6 +680,14 @@ export default class NN_InfoDetailComponent extends React.Component {
         let wfInfoListTable = []
         wfInfoListTable.push(<thead ref='thead' key={k++} className="center">{tableHeader}</thead>)
         wfInfoListTable.push(<tbody ref='tbody' key={k++} className="center" >{tableData}</tbody>)
+
+        /////////////////////////////////////////////////////////////////////////////////////////
+        // File 파일이 없으면 가장 먼저 등록할 수 있게 화면에 표시해준다.
+        /////////////////////////////////////////////////////////////////////////////////////////
+        let fileDefaultIndex = 0
+        if(this.props.nn_type != undefined && this.props.nn_type == "C"){
+            fileDefaultIndex = 2
+        }
         /////////////////////////////////////////////////////////////////////////////////////////
         // Batch Table Data Make
         /////////////////////////////////////////////////////////////////////////////////////////
@@ -841,7 +855,7 @@ export default class NN_InfoDetailComponent extends React.Component {
                 <br/>
                 <br/>
                 {this.state.trainType ?
-                <Tabs defaultIndex={0}  onSelect={tabIndexAT => this.networkSelectTabAT({ tabIndexAT })} >
+                <Tabs defaultIndex={fileDefaultIndex}  onSelect={tabIndexAT => this.networkSelectTabAT({ tabIndexAT })} >
                     <TabList>
                         <Tab>AutoMLChart</Tab>
                         <Tab>AutoMLTable</Tab>
@@ -856,7 +870,9 @@ export default class NN_InfoDetailComponent extends React.Component {
                     </TabPanel>
                     <TabPanel>
                         <div>
-                            <NN_InfoDetailAutomlTable ref="automlTable" NN_Data={this.state.lineAutoChart} />
+                            <NN_InfoDetailAutomlTable ref="automlTable" 
+                                                      NN_Data={this.state.lineAutoChart}
+                                                      NN_Auto ={this.state.NN_TableData} />
                         </div>
                     </TabPanel>
                     <TabPanel>
@@ -972,7 +988,7 @@ export default class NN_InfoDetailComponent extends React.Component {
                 }
                 <br/>
 
-                <Tabs defaultIndex={0}  onSelect={tabIndex => this.networkSelectTab({ tabIndex })} >
+                <Tabs defaultIndex={0} onSelect={tabIndex => this.networkSelectTab({ tabIndex })} >
                     <TabList>
                       <Tab>Classification</Tab>
                       <Tab>Acc&Loss</Tab>

@@ -133,8 +133,8 @@ export default class NN_InfoNewCompDetail1 extends React.Component {
 
     // Network 를 선택 하면 아래에 Image를 보여준다.
     viewNetImage(value){
-        let url = "./images/"+value.target.alt+".png"
-        if(this.state.isViewImage == true && this.state.isViewImageDetail == url){
+        let url = value.target.alt
+        if(this.state.isViewImage == true && this.state.isViewImageDetail == url ){//
             this.setState({ isViewImage: false })
             this.setState({ isViewImageDetail: null })
         }else{
@@ -230,33 +230,33 @@ export default class NN_InfoNewCompDetail1 extends React.Component {
         let helpData = []
         let width = 800
         // helpData.push(<img key={k++} src = {this.state.isViewImageDetail} style={{"width":"800"}} />)
-        if(this.state.netType == "resnet"){
+        if(this.state.isViewImageDetail == "resnet"){
             helpData.push(<Help_resnet key={k++} width={width} />)
-        }else if(this.state.netType == "autoencoder_csv"){
+        }else if(this.state.isViewImageDetail == "autoencoder_csv"){
             helpData.push(<Help_autoencoder_csv key={k++} width={width} />)
-        }else if(this.state.netType == "autoencoder_img"){
+        }else if(this.state.isViewImageDetail == "autoencoder_img"){
             helpData.push(<Help_autoencoder_img key={k++} width={width} />)
-        }else if(this.state.netType == "bilstmcrf_iob"){
+        }else if(this.state.isViewImageDetail == "bilstmcrf_iob"){
             helpData.push(<Help_bilstmcrf_iob key={k++} width={width} />)
-        }else if(this.state.netType == "cnn"){
+        }else if(this.state.isViewImageDetail == "cnn"){
             helpData.push(<Help_cnn key={k++} width={width} />)
-        }else if(this.state.netType == "doc2vec"){
+        }else if(this.state.isViewImageDetail == "doc2vec"){
             helpData.push(<Help_doc2vec key={k++} width={width} />)
-        }else if(this.state.netType == "fasttext_txt"){
+        }else if(this.state.isViewImageDetail == "fasttext_txt"){
             helpData.push(<Help_fasttext_txt key={k++} width={width} />)
-        }else if(this.state.netType == "seq2seq"){
+        }else if(this.state.isViewImageDetail == "seq2seq"){
             helpData.push(<Help_seq2seq key={k++} width={width} />)
-        }else if(this.state.netType == "seq2seq_csv"){
+        }else if(this.state.isViewImageDetail == "seq2seq_csv"){
             helpData.push(<Help_seq2seq_csv key={k++} width={width} />)
-        }else if(this.state.netType == "wcnn"){
+        }else if(this.state.isViewImageDetail == "wcnn"){
             helpData.push(<Help_wcnn key={k++} width={width} />)
-        }else if(this.state.netType == "wdnn"){
+        }else if(this.state.isViewImageDetail == "wdnn"){
             helpData.push(<Help_wdnn key={k++} width={width} />)
-        }else if(this.state.netType == "wdnn_keras"){
+        }else if(this.state.isViewImageDetail == "wdnn_keras"){
             helpData.push(<Help_wdnn_keras key={k++} width={width} />)
-        }else if(this.state.netType == "word2vec"){
+        }else if(this.state.isViewImageDetail == "word2vec"){
             helpData.push(<Help_word2vec key={k++} width={width} />)
-        }else if(this.state.netType == "word2vec_frame"){
+        }else if(this.state.isViewImageDetail == "word2vec_frame"){
             helpData.push(<Help_word2vec_frame key={k++} width={width} />)
         }
 

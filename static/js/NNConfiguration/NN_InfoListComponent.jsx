@@ -33,7 +33,7 @@ export default class NN_InfoListComponent extends React.Component {
 
     componentDidMount(){
         this.getCommonNNInfo("all");// 화면에 들어 올때 검색을 해준다.
-        this.props.setActiveItem(this.state.nextpageInit,null,null,null,null,null,null,null);//테이블의 NNID를 클릭할때 넘어갈수 있게 초기화를 해준다.
+        this.props.setActiveItem(this.state.nextpageInit,'U',null,null,null,null,null,null);//테이블의 NNID를 클릭할때 넘어갈수 있게 초기화를 해준다.
     }
 
     getCommonNNInfo(params) {
@@ -146,7 +146,7 @@ export default class NN_InfoListComponent extends React.Component {
     }
 
     handleClick(row){// Table Cell Clcik and Call Net Detail
-        this.props.setActiveItem(row["nn_id"], null, null, null, null, null, null, null);
+        this.props.setActiveItem(row["nn_id"], 'U', null, null, null, null, null, null);
         return this.props.getHeaderEvent(2); //call Net Info 
     }
 
@@ -158,7 +158,7 @@ export default class NN_InfoListComponent extends React.Component {
         if(checkbox.checked == true){
             value = checkbox.alt
             this.state.NN_TableDataCheck.push(value)
-            this.props.setActiveItem(value, null, null, null, null, null, null, null);
+            this.props.setActiveItem(value, 'U', null, null, null, null, null, null);
         }else{
             value = checkbox.alt
             let fidx = this.state.NN_TableDataCheck.indexOf(value)
@@ -167,9 +167,9 @@ export default class NN_InfoListComponent extends React.Component {
             }
             value = this.state.NN_TableDataCheck[this.state.NN_TableDataCheck.length-1]
             if(value == undefined){
-                this.props.setActiveItem(this.state.nextpageInit, null, null, null, null, null, null, null);
+                this.props.setActiveItem(this.state.nextpageInit, 'U', null, null, null, null, null, null);
             }else{
-                this.props.setActiveItem(value, null, null, null, null, null, null, null);
+                this.props.setActiveItem(value, 'U', null, null, null, null, null, null);
             }
         }
     }

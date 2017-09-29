@@ -121,7 +121,9 @@ export default class HomeComponent extends React.Component {
 
     getNetDetailInfo(){
         // if(this.state.NN_ID){
-            this.setState({NN_InfoList: <NN_InfoDetailComponent getHeaderEvent={this.getHeaderEvent} nn_id={this.state.NN_ID}/> });  
+            this.setState({NN_InfoList: <NN_InfoDetailComponent getHeaderEvent={this.getHeaderEvent} 
+                                                                nn_id={this.state.NN_ID}
+                                                                nn_type = {this.state.NN_TYPE}/> });  
         // } 
     }
     

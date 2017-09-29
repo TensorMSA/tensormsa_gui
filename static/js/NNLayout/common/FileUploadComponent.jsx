@@ -10,9 +10,6 @@ export default class FileUploadComponent extends React.Component {
         super(props)
         this.state = {
             fileData:null,
-            nn_id:null,
-            nn_wf_ver_id:null,
-            nn_node_name:null,
             percent:0,
             fileurl:'/api/v1/type/wf/state/data/detail/upload/file/nnid/',
             lineview:false
@@ -33,9 +30,6 @@ export default class FileUploadComponent extends React.Component {
     }
     
     componentDidMount() {
-        this.state.nn_id = this.props.nn_id
-        this.state.nn_wf_ver_id = this.props.nn_wf_ver_id
-        this.state.nn_node_name = this.props.nn_node_name
         this.getFileData()
     }
 
@@ -49,9 +43,9 @@ export default class FileUploadComponent extends React.Component {
     }
 
     getFileData(){
-        let nn_id = this.state.nn_id
-        let nn_wf_ver_id = this.state.nn_wf_ver_id
-        let nn_node_name = this.state.nn_node_name
+        let nn_id = this.props.nn_id
+        let nn_wf_ver_id = this.props.nn_wf_ver_id
+        let nn_node_name = this.props.nn_node_name
         this.props.reportRepository.getFileUpload(nn_id, nn_wf_ver_id, nn_node_name, this.props.nn_path_type).then((tableData) => {
                                         this.setState({ fileData : tableData})
                                     });
@@ -63,7 +57,7 @@ export default class FileUploadComponent extends React.Component {
         fparam["type"] = this.props.nn_path_type
         let re = confirm( "Are you delete?" )
         if(re == true){
-            this.props.reportRepository.deleteFileUpload(this.state.nn_id, this.state.nn_wf_ver_id, this.state.nn_node_name, fparam).then((tableData) => {
+            this.props.reportRepository.deleteFileUpload(this.props.nn_id, this.props.nn_wf_ver_id, this.props.nn_node_name, fparam).then((tableData) => {
                                                     this.getFileData()
                                                     });
         }
